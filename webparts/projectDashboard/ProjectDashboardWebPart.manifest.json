@@ -22,11 +22,12 @@
     "description": { "default": "ProjectDashboard description" },
     "officeFabricIconFontName": "Page",
     "properties": {
-      "description": "RF Cascade",
+      "description": "Project: ",
       "refreshInterval": "5000",
-      "showProjects": true,
-      "Project": "2",
-      "showButtons": true
+      "showCards": false,
+      "projectName": "RF Cascade",
+      "showButtons": false,
+      "filterValue": ""
     }
   }]
 }

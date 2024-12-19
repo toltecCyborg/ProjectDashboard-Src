@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useState } from "react";
 import { ITaskListItem } from "../../../models";
-//import "~@bootstrap/dist/css/bootstrap.min.css";
+//import "~@bootstrap/;
 
 interface ListGroupProps {
   items: ITaskListItem[];
@@ -22,7 +22,6 @@ const ListGroup = ({ items, heading, onSelectItem }: ListGroupProps) => {
         <thead>
           <tr>
             <th>Task</th>
-            <th>Status</th>
             <th>Completed</th>
             <th>Delay</th>
           </tr>
@@ -38,7 +37,6 @@ const ListGroup = ({ items, heading, onSelectItem }: ListGroupProps) => {
               }}
             >
               <td>{item.Tasks}</td>
-              <td>{item.Status}</td>
               <td>{item.Complete}</td>
               <td>{item.Delay}</td>
             </tr>

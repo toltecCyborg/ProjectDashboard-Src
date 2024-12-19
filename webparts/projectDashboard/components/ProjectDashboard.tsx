@@ -4,6 +4,8 @@ import type { IProjectDashboardProps } from "./IProjectDashboardProps";
 import { escape } from "@microsoft/sp-lodash-subset";
 import ListGroup from "./ListGroup";
 import GateCard from "./GateCard";
+import ProjectTemp from "./ProjectTemp";
+
 export default class ProjectDashboard extends React.Component<IProjectDashboardProps> {
   public render(): React.ReactElement<IProjectDashboardProps> {
     const {
@@ -31,24 +33,37 @@ export default class ProjectDashboard extends React.Component<IProjectDashboardP
         )}
         <div>
           <h2>
-            SW Project: <strong>{escape(this.props.projectName)}</strong>{" "}
+            {this.props.description + " "}
+            <strong>{escape(this.props.projectName)}</strong>{" "}
           </h2>
-          <div className={styles["cardContainer"]}>
-            {spGateListItems &&
-              spGateListItems.map((list) => (
-                <>
-                  <GateCard
-                    gate={list}
-                    index={list.Id}
-                    onSelectItem={(item, group) => {
-                      this.props.onSelectItem(item, group);
-                    }}
-                  />
-                </>
-              ))}
+          <div>
+            {!this.props.showCards && (
+              <div className={styles["cardContainer"]}>
+                {spGateListItems &&
+                  spGateListItems.map((list) => (
+                    <>
+                      <GateCard
+                        gate={list}
+                        index={list.Id}
+                        onSelectItem={(item, group) => {
+                          this.props.onSelectItem(item, group);
+                        }}
+                      />
+                    </>
+                  ))}
+              </div>
+            )}
           </div>
         </div>
-        {this.props.showProjects && (
+        {this.props.showCards && spGateListItems && (
+          <ProjectTemp
+            gates={spGateListItems}
+            onSelectItem={(item, group) => {
+              this.props.onSelectItem(item, group);
+            }}
+          />
+        )}
+        {this.props.showCards && (
           <div>
             <ul>
               {spProjectListItems &&

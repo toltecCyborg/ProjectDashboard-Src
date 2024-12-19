@@ -10,39 +10,45 @@ interface GateCardProps {
 const GateCard = ({ gate, onSelectItem, index }: GateCardProps) => {
   //Hook
   const getCardClass = (delay: number, complete: number) => {
-    if (complete === 1) return styles.white;
-    if (delay === 0) return styles.green;
-    if (delay > 0 && delay <= 7) return styles.yellow;
-    if (delay > 7) return styles.red;
+    if (complete === 1) return styles.green;
     return styles.white; // Default Class
   };
-
+  const getCardDelay = (delay: number, complete: number) => {
+    if (complete === 1) return styles.whiteFont;
+    if (delay === 0) return styles.greenFont;
+    if (delay > 0 && delay <= 7) return styles.yellowFont;
+    if (delay > 7) return styles.redFont;
+    return styles.whiteFont; // Default Class
+  };
   return (
     <>
       <div
         key={gate.Id}
-        className={`${styles["ed2Card"]} ${getCardClass(
+        className={`${styles["pilaCard"]} ${getCardClass(
           gate.Delay,
           gate.Complete
         )}`}
       >
-        <div className={styles["cardContent"]}>
-          <button
-            onClick={() => {
-              onSelectItem(gate.Title, "task");
-            }}
-          >
-            {gate.Title}
-          </button>
+        <div
+          className={`${styles["cardContent"]} ${getCardDelay(
+            gate.Delay,
+            gate.Complete
+          )}`}
+          onClick={() => {
+            onSelectItem(gate.Title, "task");
+          }}
+        >
+          <h5>
+            <strong>{gate.Title} </strong>
+          </h5>
           <p>
-            <strong>Complete:</strong> {Math.floor(gate.Complete * 100)}%
+            <strong>{Math.floor(gate.Complete * 100)}% </strong>
           </p>
-          <p>
-            <strong>Status:</strong> {gate.Status}
-          </p>
-          <p>
-            <strong>Delay:</strong> {gate.Delay} days
-          </p>
+          {gate.Delay > 0 && (
+            <p>
+              <strong>(- {gate.Delay} days) </strong>
+            </p>
+          )}
         </div>
       </div>
     </>

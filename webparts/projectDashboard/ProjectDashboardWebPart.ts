@@ -10,24 +10,20 @@ import {
 } from '@microsoft/sp-property-pane';
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
 import { IReadonlyTheme } from '@microsoft/sp-component-base';
+import { DynamicProperty } from '@microsoft/sp-component-base';
 
 import * as strings from 'ProjectDashboardWebPartStrings';
+
 import ProjectDashboard from './components/ProjectDashboard';
-import { IProjectDashboardProps } from './components/IProjectDashboardProps';
+import { GroupByGate, FilterTasks, IProjectDashboardProps } from './components';
 
 import { SPHttpClient } from '@microsoft/sp-http';
-import { IProjectListItem, ITaskListItem, IGateListItem  } from '../../models';
-import { GroupByGate } from './components/GroupByGate';
-import { FilterTasks } from './components/FilterTasks';
+import { IProjectListItem, ITaskListItem, IGateListItem,IProjectDashboardWebPartProps  } from '../../models';
 
 
-export interface IProjectDashboardWebPartProps {
-  description: string;
-  refreshInterval: number;
-  showProjects: boolean;
-  projectName: string;
-  showButtons: boolean;
-}
+import { IDynamicDataPropertyDefinition } from '@microsoft/sp-dynamic-data';
+
+
 
 export interface ISPLists {
   value: ISPList[];
@@ -47,6 +43,7 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
   private _isDarkTheme: boolean = false;
   private _environmentMessage: string = '';
 
+  public _selectedFilter: DynamicProperty<string>;
 
   public render(): void {
     const element: React.ReactElement<IProjectDashboardProps> = React.createElement(
@@ -61,8 +58,9 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
         onSelectItem: this._onSelectedItem,
         description: this.properties.description,
         projectName: this.properties.projectName,
-        showProjects: this.properties.showProjects,
+        showCards: this.properties.showCards,
         showButtons: this.properties.showButtons,
+        filterValue: this.properties.filterValue,
         refreshInterval: this.properties.refreshInterval,
         isDarkTheme: this._isDarkTheme,
         environmentMessage: this._environmentMessage,
@@ -70,14 +68,13 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
         userDisplayName: this.context.pageContext.user.displayName
       }
     );
-
+    console.log("Log Message:" + this._getEnvironmentMessage());
     ReactDom.render(element, this.domElement);
   }
 
   protected onInit(): Promise<void> {
-    return this._getEnvironmentMessage().then(message => {
-      this._environmentMessage = message;
-    });
+    this.context.dynamicDataSourceManager.initializeSource(this);
+    return super.onInit();
   }
 
   private _getEnvironmentMessage(): Promise<string> {
@@ -138,22 +135,22 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
       pages: [
         {
           header: {
-            description: strings.PropertyPaneDescription
+            description: "ED2 dashboard for internal projects..."
           },
           groups: [
             {
-              groupName: strings.BasicGroupName,
+              groupName: "Setup Project",
               groupFields: [
                 PropertyPaneTextField('description', {
-                  label: strings.DescriptionFieldLabel
+                  label: "Prefix Header:"
                 }),
                 PropertyPaneToggle('showButtons', {
-                  label: 'Buttons',
+                  label: 'Show Controls',
                   onText: 'On',
                   offText: 'Off'
                 }),
                 PropertyPaneDropdown('projectName', {
-                  label: 'Projects',
+                  label: 'Projects List',
                   options: [
                     { key: 'RF Cascade', text: 'RF Cascade' },
                     { key: 'PAM', text: 'PAM' },
@@ -163,8 +160,8 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
                 PropertyPaneTextField('refreshInterval', {
                   label: 'Refresh Interval'
                 }),
-                PropertyPaneCheckbox('showProjects', {
-                  text: 'Show Projects List'
+                PropertyPaneCheckbox('showCards', {
+                  text: 'Show Project Details'
                 })
               ]
             }
@@ -174,9 +171,44 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
     };
   }
 
+/** Dynamic data: to connect with external webpart */
+  public getPropertyDefinitions(): ReadonlyArray<IDynamicDataPropertyDefinition> {
+    return [
+      {
+        id: 'filterValue',
+        title: 'Filter Value'
+      }
+    ];
+  }
+
+  public getPropertyValue(propertyId: string): string {
+    if (propertyId === 'filterValue') {
+      return this.properties.filterValue || '';
+    }
+    return '';
+  }
+
+  protected onPropertyPaneFieldChanged(propertyPath: string, oldValue: any, newValue: any): void {
+    if (propertyPath === 'filterValue') {
+      this.context.dynamicDataSourceManager.notifyPropertyChanged('filterValue');
+    }
+    super.onPropertyPaneFieldChanged(propertyPath, oldValue, newValue);
+  }
+  
+  
   /** */
 
-  
+  private getListName (planName: string): string { 
+    const result  =  this._projects.find((item) => item.Title === planName) ;
+    let findPlanByName =  "PlanCascade";
+    if(result != undefined)
+       findPlanByName = result.ListName;
+
+    console.log("getListName: "+ this.properties.projectName +" - result: "+result?.ListName+ " Final: "+findPlanByName);
+   
+    return findPlanByName;
+  }
+
   private _onGetProjectListItems = async (): Promise<void> => {
     const response: IProjectListItem[] = await this._getProjectListItems();
     this._projects = response;
@@ -184,6 +216,7 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
   }
 
   private async _getProjectListItems(): Promise<IProjectListItem[]> {
+    //console.log("ProjectName: "+ this.properties.projectName);
     const response = await this.context.spHttpClient.get(
       this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('Projects')/items?$select=Id,Title, ListName, Link `,
       SPHttpClient.configurations.v1);
@@ -194,7 +227,6 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
     }
   
     this._tasks = [];
-    this.properties.showProjects = !this.properties.showProjects;
     const responseJson = await response.json();
   
     return responseJson.value as IProjectListItem[];
@@ -205,7 +237,7 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
     const response: ITaskListItem[] = await this._getTaskListItems();   
 
     //this._tasks = response;
-    //console.log(this._tasks);
+    console.log("Filetr: "+this._selectedFilter);
     this._tasks = FilterTasks(response, group, item);
     //console.log("Received: Value: " + item + " Group: " + group+ " Total: "+ response.length + " Filtered: " + this._tasks.length );
     this.render();
@@ -221,6 +253,9 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
 
 //  private async _getTaskListItems(project: string, grouper: string, filter : string ): Promise<ITaskListItem[]> {
     private async _getTaskListItems(): Promise<ITaskListItem[]> {
+
+      console.log("ProjectName Gate: "+ this.properties.projectName);
+    
       const response = await this.context.spHttpClient.get(
       //this.context.pageContext.web.absoluteUrl + `/_api/web/lists/RF_Cascade/items?$select=Id,Title,Complete,Status,Delay`,
       this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('PlanCascade')/items?$select=Id,Title,Complete,Status,Delay,Deliverable,Tasks,WBS`,
@@ -246,17 +281,12 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
     this.render();
   }
 
-  private async _getGateListItems(): Promise<IGateListItem[]> {
-    const result  =  this._projects.find((item) => item.Title === this.properties.projectName) ;
-    console.log("PlanName: "+ this.properties.projectName +" - result: "+result?.ListName);
-    
-    let findPlanByName =  "PlanCascade";
-    if(result != undefined)
-       findPlanByName = result.ListName;
 
+  private async _getGateListItems(): Promise<IGateListItem[]> {
+    
     const response = await this.context.spHttpClient.get(
       //this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('PlanCascade')/items?$select=Id,Title,Complete,Status,Delay,Deliverable,Tasks,WBS`,
-      this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('`+findPlanByName+`')/items?$select=Id,Title,Complete,Status,Delay,Deliverable,Tasks,WBS`,
+      this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('`+this.getListName(this.properties.projectName)+`')/items?$select=Id,Title,Complete,Status,Delay,Deliverable,Tasks,WBS`,
       SPHttpClient.configurations.v1);
   
     if (!response.ok) {
