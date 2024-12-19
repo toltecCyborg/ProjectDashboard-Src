@@ -37,7 +37,7 @@ const ListGroup = ({ items, heading, onSelectItem }: ListGroupProps) => {
               }}
             >
               <td>{item.Tasks}</td>
-              <td>{item.Complete}</td>
+              <td>{Math.floor(item.Complete * 100)}% </td>
               <td>{item.Delay}</td>
             </tr>
           ))}

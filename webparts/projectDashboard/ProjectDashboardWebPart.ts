@@ -9,8 +9,7 @@ import {
   PropertyPaneToggle
 } from '@microsoft/sp-property-pane';
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
-import { IReadonlyTheme } from '@microsoft/sp-component-base';
-import { DynamicProperty } from '@microsoft/sp-component-base';
+import { IReadonlyTheme , DynamicProperty} from '@microsoft/sp-component-base';
 
 import * as strings from 'ProjectDashboardWebPartStrings';
 
@@ -20,9 +19,7 @@ import { GroupByGate, FilterTasks, IProjectDashboardProps } from './components';
 import { SPHttpClient } from '@microsoft/sp-http';
 import { IProjectListItem, ITaskListItem, IGateListItem,IProjectDashboardWebPartProps  } from '../../models';
 
-
 import { IDynamicDataPropertyDefinition } from '@microsoft/sp-dynamic-data';
-
 
 
 export interface ISPLists {
@@ -60,6 +57,8 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
         projectName: this.properties.projectName,
         showCards: this.properties.showCards,
         showButtons: this.properties.showButtons,
+        showTasks: this.properties.showTasks,
+        showProjects: this.properties.showProjects,
         filterValue: this.properties.filterValue,
         refreshInterval: this.properties.refreshInterval,
         isDarkTheme: this._isDarkTheme,
@@ -140,8 +139,19 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
           groups: [
             {
               groupName: "Setup Project",
-              groupFields: [
-                PropertyPaneTextField('description', {
+              groupFields: [              
+                PropertyPaneDropdown('projectName', {
+                  label: 'Select Project',
+                  options: [
+                    { key: 'RF Cascade', text: 'RF Cascade' },
+                    { key: 'PAM', text: 'PAM' },
+                    { key: 'Heatmap', text: 'Heatmap' },
+                    { key: 'Freestar', text: 'Freestar' }
+                  ]}),
+                  PropertyPaneCheckbox('showCards', {
+                    text: 'As Stack (default As Progress Bar)'
+                  }),
+                  PropertyPaneTextField('description', {
                   label: "Prefix Header:"
                 }),
                 PropertyPaneToggle('showButtons', {
@@ -149,19 +159,8 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
                   onText: 'On',
                   offText: 'Off'
                 }),
-                PropertyPaneDropdown('projectName', {
-                  label: 'Projects List',
-                  options: [
-                    { key: 'RF Cascade', text: 'RF Cascade' },
-                    { key: 'PAM', text: 'PAM' },
-                    { key: 'Heatmap', text: 'Heatmap' },
-                    { key: 'Freestar', text: 'Freestar' }
-                  ]}),
                 PropertyPaneTextField('refreshInterval', {
                   label: 'Refresh Interval'
-                }),
-                PropertyPaneCheckbox('showCards', {
-                  text: 'Show Project Details'
                 })
               ]
             }
@@ -213,6 +212,7 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
     const response: IProjectListItem[] = await this._getProjectListItems();
     this._projects = response;
     this.render();
+    this.properties.showProjects = !this.properties.showProjects;
   }
 
   private async _getProjectListItems(): Promise<IProjectListItem[]> {
@@ -226,9 +226,7 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
       throw new Error(responseText);
     }
   
-    this._tasks = [];
     const responseJson = await response.json();
-  
     return responseJson.value as IProjectListItem[];
   }
 
@@ -246,9 +244,9 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
 
   private _onGetTaskListItems = async (): Promise<void> => {
     const response: ITaskListItem[] = await this._getTaskListItems();
-    
     this._tasks = response;
     this.render();
+    this.properties.showTasks = !this.properties.showTasks;
   }
 
 //  private async _getTaskListItems(project: string, grouper: string, filter : string ): Promise<ITaskListItem[]> {

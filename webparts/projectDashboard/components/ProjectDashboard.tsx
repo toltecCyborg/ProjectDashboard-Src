@@ -5,6 +5,7 @@ import { escape } from "@microsoft/sp-lodash-subset";
 import ListGroup from "./ListGroup";
 import GateCard from "./GateCard";
 import ProjectTemp from "./ProjectTemp";
+import ListProject from "./ListProject";
 
 export default class ProjectDashboard extends React.Component<IProjectDashboardProps> {
   public render(): React.ReactElement<IProjectDashboardProps> {
@@ -53,32 +54,34 @@ export default class ProjectDashboard extends React.Component<IProjectDashboardP
                   ))}
               </div>
             )}
+            {this.props.showCards && spGateListItems && (
+              <ProjectTemp
+                gates={spGateListItems}
+                onSelectItem={(item, group) => {
+                  this.props.onSelectItem(item, group);
+                }}
+              />
+            )}
           </div>
         </div>
-        {this.props.showCards && spGateListItems && (
-          <ProjectTemp
-            gates={spGateListItems}
-            onSelectItem={(item, group) => {
-              this.props.onSelectItem(item, group);
-            }}
-          />
+        {this.props.showProjects && (
+          <>
+            <ListProject
+              items={spProjectListItems}
+              heading={
+                spProjectListItems.length > 0
+                  ? "Tasks: " + spProjectListItems[0].Title
+                  : ""
+              }
+              grouper={"gate"}
+              selection={
+                spProjectListItems.length > 0 ? spProjectListItems[0].Title : ""
+              }
+              onSelectItem={this.onSelectItemsClicked}
+            />
+          </>
         )}
-        {this.props.showCards && (
-          <div>
-            <ul>
-              {spProjectListItems &&
-                spProjectListItems.map((list) => (
-                  <li key={list.Id}>
-                    <strong>Id:</strong> {list.Id},<strong>Title:</strong>
-                    {list.Title},<strong>ListName:</strong>
-                    {list.ListName},<strong>Link:</strong>
-                    {"'" + list.Link + "'"}
-                  </li>
-                ))}
-            </ul>
-          </div>
-        )}
-        {spTaskListItems.length > 0 && (
+        {this.props.showTasks && spTaskListItems.length > 0 && (
           <>
             <ListGroup
               items={spTaskListItems}

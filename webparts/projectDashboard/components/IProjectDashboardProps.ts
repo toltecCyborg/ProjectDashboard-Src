@@ -17,6 +17,8 @@ export interface IProjectDashboardProps {
   projectName: string;
   showCards: boolean;
   showButtons: boolean;
+  showTasks: boolean;
+  showProjects: boolean;
   refreshInterval: number;
   filterValue: string;
   isDarkTheme: boolean;
