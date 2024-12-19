@@ -27,6 +27,8 @@
       "showCards": false,
       "projectName": "RF Cascade",
       "showButtons": false,
+      "showProjects": false,
+      "showTasks": false,
       "filterValue": ""
     }
   }]

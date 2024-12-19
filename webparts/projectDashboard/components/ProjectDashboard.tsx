@@ -7,7 +7,13 @@ import GateCard from "./GateCard";
 import ProjectTemp from "./ProjectTemp";
 import ListProject from "./ListProject";
 
+import { Switch } from "@fluentui/react-components";
+//import type { SwitchProps } from "@fluentui/react-components";
+
 export default class ProjectDashboard extends React.Component<IProjectDashboardProps> {
+  private _showProjects: boolean = false;
+  private _showTasks: boolean = false;
+
   public render(): React.ReactElement<IProjectDashboardProps> {
     const {
       spGateListItems,
@@ -24,12 +30,27 @@ export default class ProjectDashboard extends React.Component<IProjectDashboardP
       >
         {this.props.showButtons && (
           <div className={styles.buttons}>
-            <button type="button" onClick={this.onGetTaskListItemsClicked}>
+            {/* <button type="button" onClick={this.onGetTaskListItemsClicked}>
               Show Tasks
             </button>
             <button type="button" onClick={this.onGetProjectListItemsClicked}>
               Show Projects
-            </button>
+            </button> */}
+
+            <Switch
+              label="Show Tasks"
+              onChange={(ev) => {
+                this._showTasks = ev.currentTarget.checked;
+                this.onGetTaskListItemsChanged();
+              }}
+            />
+            <Switch
+              label="Show Projects"
+              onChange={(ev) => {
+                this._showTasks = ev.currentTarget.checked;
+                this.onGetProjectListItemsChanged();
+              }}
+            />
           </div>
         )}
         <div>
@@ -38,21 +59,15 @@ export default class ProjectDashboard extends React.Component<IProjectDashboardP
             <strong>{escape(this.props.projectName)}</strong>{" "}
           </h2>
           <div>
-            {!this.props.showCards && (
-              <div className={styles["cardContainer"]}>
-                {spGateListItems &&
-                  spGateListItems.map((list) => (
-                    <>
-                      <GateCard
-                        gate={list}
-                        index={list.Id}
-                        onSelectItem={(item, group) => {
-                          this.props.onSelectItem(item, group);
-                        }}
-                      />
-                    </>
-                  ))}
-              </div>
+            {!this.props.showCards && spGateListItems && (
+              <>
+                <GateCard
+                  gates={spGateListItems}
+                  onSelectItem={(item, group) => {
+                    this.props.onSelectItem(item, group);
+                  }}
+                />
+              </>
             )}
             {this.props.showCards && spGateListItems && (
               <ProjectTemp
@@ -64,7 +79,7 @@ export default class ProjectDashboard extends React.Component<IProjectDashboardP
             )}
           </div>
         </div>
-        {this.props.showProjects && (
+        {this._showProjects && (
           <>
             <ListProject
               items={spProjectListItems}
@@ -81,7 +96,7 @@ export default class ProjectDashboard extends React.Component<IProjectDashboardP
             />
           </>
         )}
-        {this.props.showTasks && spTaskListItems.length > 0 && (
+        {this._showTasks && spTaskListItems.length > 0 && (
           <>
             <ListGroup
               items={spTaskListItems}
@@ -106,21 +121,30 @@ export default class ProjectDashboard extends React.Component<IProjectDashboardP
     console.log(Message);
   }
 
-  private onGetProjectListItemsClicked = (
-    event: React.MouseEvent<HTMLButtonElement>
-  ): void => {
-    event.preventDefault();
+  private onGetProjectListItemsChanged = (): void => {
     if (this.props.onGetProjectListItems) this.props.onGetProjectListItems();
   };
 
-  private onGetTaskListItemsClicked = (
-    event: React.MouseEvent<HTMLButtonElement>
-  ): void => {
-    event.preventDefault();
-
+  private onGetTaskListItemsChanged = (): void => {
     if (this.props.onGetTaskListItems) this.props.onGetTaskListItems();
-    this.onSelectItemsClicked("Testing 2...:" + event.button.toString());
   };
+
+  // private onGetProjectListItemsClicked = (
+  //   event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  // ): void => {
+  //   event.preventDefault();
+  //   this._showProjects = !this._showProjects;
+  //   if (this.props.onGetProjectListItems) this.props.onGetProjectListItems();
+  // };
+
+  // private onGetTaskListItemsClicked = (
+  //   event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  // ): void => {
+  //   event.preventDefault();
+
+  //   this._showTasks = !this._showTasks;
+  //   if (this.props.onGetTaskListItems) this.props.onGetTaskListItems();
+  // };
 
   componentDidMount(): void {
     // Cargar datos al iniciar

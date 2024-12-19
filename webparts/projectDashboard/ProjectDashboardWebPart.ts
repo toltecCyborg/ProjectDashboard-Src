@@ -53,21 +53,23 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
         spProjectListItems: this._projects,
         onGetProjectListItems: this._onGetProjectListItems,
         onSelectItem: this._onSelectedItem,
+
         description: this.properties.description,
         projectName: this.properties.projectName,
         showCards: this.properties.showCards,
         showButtons: this.properties.showButtons,
-        showTasks: this.properties.showTasks,
-        showProjects: this.properties.showProjects,
-        filterValue: this.properties.filterValue,
         refreshInterval: this.properties.refreshInterval,
+
+        filterValue: this.properties.filterValue,
+
         isDarkTheme: this._isDarkTheme,
         environmentMessage: this._environmentMessage,
         hasTeamsContext: !!this.context.sdks.microsoftTeams,
         userDisplayName: this.context.pageContext.user.displayName
       }
     );
-    console.log("Log Message:" + this._getEnvironmentMessage());
+    
+    if(this.properties.showButtons) console.log("Log Message:" + this._getEnvironmentMessage() );
     ReactDom.render(element, this.domElement);
   }
 
@@ -212,8 +214,7 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
     const response: IProjectListItem[] = await this._getProjectListItems();
     this._projects = response;
     this.render();
-    this.properties.showProjects = !this.properties.showProjects;
-  }
+   }
 
   private async _getProjectListItems(): Promise<IProjectListItem[]> {
     //console.log("ProjectName: "+ this.properties.projectName);
@@ -246,8 +247,7 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
     const response: ITaskListItem[] = await this._getTaskListItems();
     this._tasks = response;
     this.render();
-    this.properties.showTasks = !this.properties.showTasks;
-  }
+   }
 
 //  private async _getTaskListItems(project: string, grouper: string, filter : string ): Promise<ITaskListItem[]> {
     private async _getTaskListItems(): Promise<ITaskListItem[]> {
