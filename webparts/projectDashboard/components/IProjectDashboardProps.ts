@@ -10,12 +10,13 @@ export interface IProjectDashboardProps {
   onGetProjectListItems?: ButtonClickedCallback;
   spTaskListItems: ITaskListItem[];
   onGetTaskListItems?: ButtonClickedCallback;
+  selectedTask:ITaskListItem;
   spGateListItems: IGateListItem[];
   onGetGateListItems?: ButtonClickedCallback;
   onSelectItem: (item: string, group: string) => void;
   description: string;
   projectName: string;
-  showCards: boolean;
+  showStack: boolean;
   showButtons: boolean;
   refreshInterval: number;
   filterValue: string;

@@ -1,8 +1,11 @@
+import { ITaskListItem } from "./ITaskListItem";
+
 export interface IProjectDashboardWebPartProps {
     description: string;
     refreshInterval: number;
-    showCards: boolean;
+    showStack: boolean;
     projectName: string;
     showButtons: boolean;
+    selectedTask: ITaskListItem;
     filterValue: string;
   }

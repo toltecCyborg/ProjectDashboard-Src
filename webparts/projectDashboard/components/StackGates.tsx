@@ -6,7 +6,7 @@ interface GateCardProps {
   gates: IGateListItem[];
   onSelectItem: (item: string, group: string) => void;
 }
-const ProjectTemp = ({ gates, onSelectItem }: GateCardProps) => {
+const StackGates = ({ gates, onSelectItem }: GateCardProps) => {
   //Hook
   const getCardClass = (delay: number, complete: number) => {
     if (complete === 1) return styles.green;
@@ -72,4 +72,4 @@ const ProjectTemp = ({ gates, onSelectItem }: GateCardProps) => {
   );
 };
 
-export default ProjectTemp;
+export default StackGates;

@@ -1,12 +1,13 @@
 import * as React from "react";
-import { IGateListItem } from "../../../models";
+import { ITaskListItem } from "../../../models";
 import styles from "./ProjectDashboard.module.scss";
 
 interface GateCardProps {
-  gates: IGateListItem[];
+  tasks: ITaskListItem[];
   onSelectItem: (item: string, group: string) => void;
 }
-const GateCard = ({ gates, onSelectItem }: GateCardProps) => {
+const ProgressTasks = ({ tasks, onSelectItem }: GateCardProps) => {
+  //let _showDetails: boolean = false;
   //Hook
   const getCardClass = (delay: number, complete: number) => {
     if (complete === 1) return styles.green;
@@ -22,7 +23,7 @@ const GateCard = ({ gates, onSelectItem }: GateCardProps) => {
   return (
     <>
       <div className={styles["cardContainer"]}>
-        {gates.map((gate, index) => (
+        {tasks.map((gate, index) => (
           <div
             key={gate.Id}
             className={`${styles["pilaCard"]} ${getCardClass(
@@ -36,11 +37,11 @@ const GateCard = ({ gates, onSelectItem }: GateCardProps) => {
                 gate.Complete
               )}`}
               onClick={() => {
-                onSelectItem(gate.Title, "task");
+                onSelectItem(gate.Tasks, "task");
               }}
             >
               <h5>
-                <strong>{gate.Title} </strong>
+                <strong>{gate.Tasks} </strong>
               </h5>
               <p>
                 <strong>{Math.floor(gate.Complete * 100)}% </strong>
@@ -58,4 +59,4 @@ const GateCard = ({ gates, onSelectItem }: GateCardProps) => {
   );
 };
 
-export default GateCard;
+export default ProgressTasks;

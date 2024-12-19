@@ -3,11 +3,13 @@ import styles from "./ProjectDashboard.module.scss";
 import type { IProjectDashboardProps } from "./IProjectDashboardProps";
 import { escape } from "@microsoft/sp-lodash-subset";
 import ListGroup from "./ListGroup";
-import GateCard from "./GateCard";
-import ProjectTemp from "./ProjectTemp";
 import ListProject from "./ListProject";
 
 import { Switch } from "@fluentui/react-components";
+import StackGates from "./StackGates";
+import ProgressTasks from "./ProgressTasks";
+import ProgressGates from "./ProgressGates";
+import TaskCard from "./TaskSummary";
 //import type { SwitchProps } from "@fluentui/react-components";
 
 export default class ProjectDashboard extends React.Component<IProjectDashboardProps> {
@@ -59,9 +61,17 @@ export default class ProjectDashboard extends React.Component<IProjectDashboardP
             <strong>{escape(this.props.projectName)}</strong>{" "}
           </h2>
           <div>
-            {!this.props.showCards && spGateListItems && (
+            {!this.props.showStack && spGateListItems && (
+              <ProgressGates
+                gates={spGateListItems}
+                onSelectItem={(item, group) => {
+                  this.props.onSelectItem(item, group);
+                }}
+              />
+            )}
+            {this.props.showStack && spGateListItems && (
               <>
-                <GateCard
+                <StackGates
                   gates={spGateListItems}
                   onSelectItem={(item, group) => {
                     this.props.onSelectItem(item, group);
@@ -69,9 +79,9 @@ export default class ProjectDashboard extends React.Component<IProjectDashboardP
                 />
               </>
             )}
-            {this.props.showCards && spGateListItems && (
-              <ProjectTemp
-                gates={spGateListItems}
+            {spTaskListItems && (
+              <ProgressTasks
+                tasks={spTaskListItems}
                 onSelectItem={(item, group) => {
                   this.props.onSelectItem(item, group);
                 }}
@@ -79,22 +89,13 @@ export default class ProjectDashboard extends React.Component<IProjectDashboardP
             )}
           </div>
         </div>
-        {this._showProjects && (
+
+        {this.props.selectedTask ? (
           <>
-            <ListProject
-              items={spProjectListItems}
-              heading={
-                spProjectListItems.length > 0
-                  ? "Tasks: " + spProjectListItems[0].Title
-                  : ""
-              }
-              grouper={"gate"}
-              selection={
-                spProjectListItems.length > 0 ? spProjectListItems[0].Title : ""
-              }
-              onSelectItem={this.onSelectItemsClicked}
-            />
+            <TaskCard task={this.props.selectedTask} />
           </>
+        ) : (
+          <p>Task not found...</p>
         )}
         {this._showTasks && spTaskListItems.length > 0 && (
           <>
@@ -113,12 +114,36 @@ export default class ProjectDashboard extends React.Component<IProjectDashboardP
             />
           </>
         )}
+        {this._showProjects && (
+          <>
+            <ListProject
+              items={spProjectListItems}
+              heading={
+                spProjectListItems.length > 0
+                  ? "Tasks: " + spProjectListItems[0].Title
+                  : ""
+              }
+              grouper={"gate"}
+              selection={
+                spProjectListItems.length > 0 ? spProjectListItems[0].Title : ""
+              }
+              onSelectItem={this.onSelectItemsClicked}
+            />
+          </>
+        )}
       </section>
     );
   }
 
   private onSelectItemsClicked(Message: string): void {
-    console.log(Message);
+    console.log(
+      "ProjectDashboar-Message: " +
+        Message +
+        " length: " +
+        this.props.spTaskListItems.length
+    );
+    //this._taskNameToFind = Message;
+    //console.log("ProjectDashboar-onSelectItemsClicked: " + Message);
   }
 
   private onGetProjectListItemsChanged = (): void => {
