@@ -287,6 +287,19 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
 
     const response: IGateListItem[] = await this._getGateListItems();
     this._gates = response;
+
+    //Reset view
+    this._tasks = [];
+    this._selectedTask = {
+      Id: "", 
+      Title: "", 
+      Complete:0 , 
+      Status: "", 
+      Delay:0 , 
+      Deliverable: "", 
+      Tasks: "No task"
+      };
+
     this.render();
   }
 
@@ -314,10 +327,9 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
     taskList: ITaskListItem[],
     taskName: string
   ): ITaskListItem  {
-    console.log("findTaskByName  taskName: " + taskName+ " lenght: "+ taskList.length);
 
     const task =  taskList.find((task) => task.Tasks === taskName);
-    console.log ("findTaskByName  filter: "+  task?.Tasks)
+    console.log("findTaskByName  taskName: " + taskName+ " lenght: "+ taskList.length + " filter: "+  task?.Tasks);
 
     if(task !== undefined)
       return task;
@@ -331,11 +343,5 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
       Deliverable: "", 
       Tasks: "No Task Found..."
       };
-
-//      else
-  //    task = taskList.find((task) => task.Tasks === taskName);
-
-   
-    
   }
 }

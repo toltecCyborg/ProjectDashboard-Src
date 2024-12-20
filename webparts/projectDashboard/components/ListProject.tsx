@@ -8,7 +8,7 @@ interface ListProjectProps {
   heading: string;
   grouper: string;
   selection: string;
-  onSelectItem: (item: string) => void;
+  onSelectItem: (item: string, group: string) => void;
 }
 const ListProject = ({ items, heading, onSelectItem }: ListProjectProps) => {
   //Hook
@@ -33,7 +33,7 @@ const ListProject = ({ items, heading, onSelectItem }: ListProjectProps) => {
               className={selectedIndex === index ? "table-active" : ""}
               onClick={() => {
                 setSelectedIndex(index);
-                onSelectItem(item.Title);
+                onSelectItem(item.Title,"project");
               }}
             >
               <td>{item.Title}</td>

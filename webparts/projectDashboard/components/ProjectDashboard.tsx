@@ -2,19 +2,20 @@ import * as React from "react";
 import styles from "./ProjectDashboard.module.scss";
 import type { IProjectDashboardProps } from "./IProjectDashboardProps";
 import { escape } from "@microsoft/sp-lodash-subset";
-import ListGroup from "./ListGroup";
 import ListProject from "./ListProject";
 
 import { Switch } from "@fluentui/react-components";
 import StackGates from "./StackGates";
 import ProgressTasks from "./ProgressTasks";
 import ProgressGates from "./ProgressGates";
-import TaskCard from "./TaskSummary";
+import TaskCard from "./TaskCard";
+import ListTasks from "./ListTasks";
 //import type { SwitchProps } from "@fluentui/react-components";
 
 export default class ProjectDashboard extends React.Component<IProjectDashboardProps> {
   private _showProjects: boolean = false;
   private _showTasks: boolean = false;
+  private _showDetails: boolean = false;
 
   public render(): React.ReactElement<IProjectDashboardProps> {
     const {
@@ -49,10 +50,18 @@ export default class ProjectDashboard extends React.Component<IProjectDashboardP
             <Switch
               label="Show Projects"
               onChange={(ev) => {
-                this._showTasks = ev.currentTarget.checked;
+                this._showProjects = ev.currentTarget.checked;
                 this.onGetProjectListItemsChanged();
               }}
             />
+            <button
+              type="button"
+              onClick={() => {
+                this.onReset();
+              }}
+            >
+              Reset
+            </button>
           </div>
         )}
         <div>
@@ -66,6 +75,7 @@ export default class ProjectDashboard extends React.Component<IProjectDashboardP
                 gates={spGateListItems}
                 onSelectItem={(item, group) => {
                   this.props.onSelectItem(item, group);
+                  this._showDetails = true;
                 }}
               />
             )}
@@ -79,7 +89,7 @@ export default class ProjectDashboard extends React.Component<IProjectDashboardP
                 />
               </>
             )}
-            {spTaskListItems && (
+            {this._showDetails && spTaskListItems.length > 0 && (
               <ProgressTasks
                 tasks={spTaskListItems}
                 onSelectItem={(item, group) => {
@@ -90,27 +100,23 @@ export default class ProjectDashboard extends React.Component<IProjectDashboardP
           </div>
         </div>
 
-        {this.props.selectedTask ? (
+        {this._showDetails && this.props.selectedTask.Title.length > 0 && (
           <>
             <TaskCard task={this.props.selectedTask} />
           </>
-        ) : (
-          <p>Task not found...</p>
         )}
         {this._showTasks && spTaskListItems.length > 0 && (
           <>
-            <ListGroup
+            <ListTasks
               items={spTaskListItems}
               heading={
                 spTaskListItems.length > 0
                   ? "Tasks: " + spTaskListItems[0].Title
                   : ""
               }
-              grouper={"gate"}
-              selection={
-                spTaskListItems.length > 0 ? spTaskListItems[0].Title : ""
-              }
-              onSelectItem={this.onSelectItemsClicked}
+              onSelectItem={(item, group) => {
+                this.props.onSelectItem(item, group);
+              }}
             />
           </>
         )}
@@ -127,7 +133,9 @@ export default class ProjectDashboard extends React.Component<IProjectDashboardP
               selection={
                 spProjectListItems.length > 0 ? spProjectListItems[0].Title : ""
               }
-              onSelectItem={this.onSelectItemsClicked}
+              onSelectItem={(item, group) => {
+                this.props.onSelectItem(item, group);
+              }}
             />
           </>
         )}
@@ -135,13 +143,12 @@ export default class ProjectDashboard extends React.Component<IProjectDashboardP
     );
   }
 
-  private onSelectItemsClicked(Message: string): void {
-    console.log(
-      "ProjectDashboar-Message: " +
-        Message +
-        " length: " +
-        this.props.spTaskListItems.length
-    );
+  private onReset(): void {
+    //this._showDetails = false;
+    if (this.props.onGetGateListItems) this.props.onGetGateListItems();
+
+    console.log("ProjectDashboar-onReset...");
+
     //this._taskNameToFind = Message;
     //console.log("ProjectDashboar-onSelectItemsClicked: " + Message);
   }

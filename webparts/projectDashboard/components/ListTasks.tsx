@@ -6,11 +6,9 @@ import { ITaskListItem } from "../../../models";
 interface ListGroupProps {
   items: ITaskListItem[];
   heading: string;
-  grouper: string;
-  selection: string;
-  onSelectItem: (item: string) => void;
+  onSelectItem: (item: string, group: string) => void;
 }
-const ListGroup = ({ items, heading, onSelectItem }: ListGroupProps) => {
+const ListTasks = ({ items, heading, onSelectItem }: ListGroupProps) => {
   //Hook
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
@@ -33,7 +31,7 @@ const ListGroup = ({ items, heading, onSelectItem }: ListGroupProps) => {
               className={selectedIndex === index ? "table-active" : ""}
               onClick={() => {
                 setSelectedIndex(index);
-                onSelectItem(item.Tasks);
+                onSelectItem(item.Tasks, "task");
               }}
             >
               <td>{item.Tasks}</td>
@@ -43,29 +41,8 @@ const ListGroup = ({ items, heading, onSelectItem }: ListGroupProps) => {
           ))}
         </tbody>
       </table>
-
-      {/* <h3>Formated as List</h3>
-      <ul className="list-group">
-        {items.map((item, index) => (
-          <li
-            className={
-              selectedIndex === index
-                ? "list-group-item active"
-                : "list-group-item"
-            }
-            key={item.Id}
-            onClick={() => {
-              setSelectedIndex(index);
-              onSelectItem(item.Title);
-            }}
-          >
-            Task: {item.Title} / {item.Deliverable} / {item.Tasks} : Status:{" "}
-            {item.Status} ; Completed: {item.Complete}; Delay: {item.Delay}
-          </li>
-        ))}
-      </ul> */}
     </>
   );
 };
 
-export default ListGroup;
+export default ListTasks;
