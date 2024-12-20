@@ -31,10 +31,10 @@ const ListTasks = ({ items, heading, onSelectItem }: ListGroupProps) => {
               className={selectedIndex === index ? "table-active" : ""}
               onClick={() => {
                 setSelectedIndex(index);
-                onSelectItem(item.Tasks, "task");
+                onSelectItem(item.Task, "task");
               }}
             >
-              <td>{item.Tasks}</td>
+              <td>{item.Task}</td>
               <td>{Math.floor(item.Complete * 100)}% </td>
               <td>{item.Delay}</td>
             </tr>

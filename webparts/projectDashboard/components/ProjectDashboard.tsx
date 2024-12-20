@@ -15,7 +15,7 @@ import ListTasks from "./ListTasks";
 export default class ProjectDashboard extends React.Component<IProjectDashboardProps> {
   private _showProjects: boolean = false;
   private _showTasks: boolean = false;
-  private _showDetails: boolean = false;
+  private _showDetails: boolean;
 
   public render(): React.ReactElement<IProjectDashboardProps> {
     const {
@@ -62,9 +62,15 @@ export default class ProjectDashboard extends React.Component<IProjectDashboardP
             >
               Reset
             </button>
+            <Switch
+              label="Detailed"
+              onChange={(ev) => {
+                this._showDetails = ev.currentTarget.checked;
+              }}
+            />
           </div>
         )}
-        <div>
+        <div className="columnContainer">
           <h2>
             {this.props.description + " "}
             <strong>{escape(this.props.projectName)}</strong>{" "}
@@ -89,9 +95,10 @@ export default class ProjectDashboard extends React.Component<IProjectDashboardP
                 />
               </>
             )}
-            {this._showDetails && spTaskListItems.length > 0 && (
+            {spTaskListItems.length > 0 && (
               <ProgressTasks
                 tasks={spTaskListItems}
+                showDetails={this._showDetails}
                 onSelectItem={(item, group) => {
                   this.props.onSelectItem(item, group);
                 }}
@@ -100,11 +107,15 @@ export default class ProjectDashboard extends React.Component<IProjectDashboardP
           </div>
         </div>
 
-        {this._showDetails && this.props.selectedTask.Title.length > 0 && (
-          <>
-            <TaskCard task={this.props.selectedTask} />
-          </>
-        )}
+        {this.props.selectedTask &&
+          this.props.selectedTask.Title.length > 0 && (
+            <>
+              <TaskCard
+                task={this.props.selectedTask}
+                showDetails={this._showDetails}
+              />
+            </>
+          )}
         {this._showTasks && spTaskListItems.length > 0 && (
           <>
             <ListTasks

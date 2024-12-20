@@ -267,7 +267,7 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
     
       const response = await this.context.spHttpClient.get(
       //this.context.pageContext.web.absoluteUrl + `/_api/web/lists/RF_Cascade/items?$select=Id,Title,Complete,Status,Delay`,
-      this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('PlanCascade')/items?$select=Id,Title,Complete,Status,Delay,Deliverable,Tasks,WBS`,
+      this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('PlanCascade')/items?$select=Id,Title,Complete,Status,Delay,Deliverable,Task,WBS,Description,Responsible,Start,Finish,Barriers, ActualFinish, Effort, ActionableStatus, EvidenceOfCompletion`,
       SPHttpClient.configurations.v1);
 
     if (!response.ok) {
@@ -290,24 +290,17 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
 
     //Reset view
     this._tasks = [];
-    this._selectedTask = {
-      Id: "", 
-      Title: "", 
-      Complete:0 , 
-      Status: "", 
-      Delay:0 , 
-      Deliverable: "", 
-      Tasks: "No task"
-      };
+    this._selectedTask = this.newTask();
 
     this.render();
   }
 
+ 
   private async _getGateListItems(): Promise<IGateListItem[]> {
     
     const response = await this.context.spHttpClient.get(
       //this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('PlanCascade')/items?$select=Id,Title,Complete,Status,Delay,Deliverable,Tasks,WBS`,
-      this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('`+this.getListName(this.properties.projectName)+`')/items?$select=Id,Title,Complete,Status,Delay,Deliverable,Tasks,WBS`,
+      this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('`+this.getListName(this.properties.projectName)+`')/items?$select=Id,Title,Complete,Status,Delay,Deliverable,Task,WBS`,
       SPHttpClient.configurations.v1);
   
     if (!response.ok) {
@@ -328,11 +321,16 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
     taskName: string
   ): ITaskListItem  {
 
-    const task =  taskList.find((task) => task.Tasks === taskName);
-    console.log("findTaskByName  taskName: " + taskName+ " lenght: "+ taskList.length + " filter: "+  task?.Tasks);
+    const task =  taskList.find((task) => task.Task === taskName);
+    console.log("findTaskByName  taskName: " + taskName+ " lenght: "+ taskList.length + " filter: "+  task?.Task);
 
     if(task !== undefined)
       return task;
+    
+   return this.newTask();
+  }
+
+  private newTask( ): ITaskListItem  {
     
    return {
       Id: "", 
@@ -341,7 +339,7 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
       Status: "", 
       Delay:0 , 
       Deliverable: "", 
-      Tasks: "No Task Found..."
+      Task: "No Task Found..."
       };
   }
 }

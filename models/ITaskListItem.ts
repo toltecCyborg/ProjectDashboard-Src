@@ -5,5 +5,14 @@ export interface ITaskListItem {
     Status: string;
     Delay: number;
     Deliverable: string;
-    Tasks: string;
+    Task: string;
+    Description?: string;
+    Responsible?: string;
+    Start?: Date;
+    Finish?: Date;
+    Barriers?: string;
+    ActualFinish?: Date;
+    Effort?: number; 
+    ActionableStatus?: string;
+    EvidenceOfCompletion?: string;
   }

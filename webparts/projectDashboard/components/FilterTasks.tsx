@@ -17,7 +17,7 @@ export function FilterTasks(
     Id: group.Id,
     Status: group.Status,
     Deliverable: group.Deliverable,
-    Tasks: group.Tasks,
+    Task: group.Task
   }));
 
   /*

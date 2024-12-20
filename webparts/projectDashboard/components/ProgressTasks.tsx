@@ -4,6 +4,7 @@ import styles from "./ProjectDashboard.module.scss";
 
 interface GateCardProps {
   tasks: ITaskListItem[];
+  showDetails: boolean;
   onSelectItem: (item: string, group: string) => void;
 }
 const ProgressTasks = ({ tasks, onSelectItem }: GateCardProps) => {
@@ -37,11 +38,11 @@ const ProgressTasks = ({ tasks, onSelectItem }: GateCardProps) => {
                 gate.Complete
               )}`}
               onClick={() => {
-                onSelectItem(gate.Tasks, "task");
+                onSelectItem(gate.Task, "task");
               }}
             >
               <h5>
-                <strong>{gate.Tasks} </strong>
+                <strong>{gate.Task} </strong>
               </h5>
               <p>
                 <strong>{Math.floor(gate.Complete * 100)}% </strong>
