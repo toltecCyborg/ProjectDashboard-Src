@@ -59,18 +59,51 @@ h2 {
 }
 
 .pilaCard {
-  background-color: #ffffcc;
+  background-color: whitesmoke;
   border-radius: 0px;
   border-color:#333;
   box-shadow: 0 4px 6px rgba(8, 8, 8, 0.89);
   width: 120px;
-  height: 90px;
+  height: 100px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 .pilaCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+}
+.pilaCard h3 {
+  margin: 2px;
+}
+.pilaCard p {
+  font-size: 10px;
+}
+.progressContainer {
+  display: flex;
+  flex-direction: row;
+  height: 40px;
+  max-width: 600px;
+  display: flex;
+  flex-direction: row;
+  gap: 2px;
+  padding: 2px;
+  margin: 0px;
+  justify-content: start;
+  align-items: start;
+  overflow: auto;
+}
+
+.progressCard {
+  background-color: #ffffcc;
+  border-color:#333;
+  box-shadow: 0 4px 6px rgba(8, 8, 8, 0.89);
+  min-width: 7px;
+  min-height: 30px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.progressCard:hover {
   transform: translateY(-5px);
   box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
 }
@@ -110,12 +143,7 @@ h2 {
   font-size: 10px;
 }
 
-.pilaCard h3 {
-  margin: 2px;
-}
-.pilaCard p {
-  font-size: 10px;
-}
+
 .cardHeader {
   background-color: #56b3fa; /* Estilo destacado */
   color: #ffffff;

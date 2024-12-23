@@ -282,20 +282,14 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
   }
 
   private _onGetGateListItems = async (): Promise<void> => {
-    const responseProj: IProjectListItem[] = await this._getProjectListItems();
-    this._projects = responseProj;
-
-    const response: IGateListItem[] = await this._getGateListItems();
-    this._gates = response;
-
-    //Reset view
-    this._tasks = [];
+    this._projects = await this._getProjectListItems();
+    this._tasks = await this._getTaskListItems();
+    this._gates = await this._getGateListItems();
     this._selectedTask = this.newTask();
 
     this.render();
   }
 
- 
   private async _getGateListItems(): Promise<IGateListItem[]> {
     
     const response = await this.context.spHttpClient.get(

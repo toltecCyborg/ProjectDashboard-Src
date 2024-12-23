@@ -16,8 +16,13 @@ export interface IProjectDashboardProps {
   onSelectItem: (item: string, group: string) => void;
   description: string;
   projectName: string;
+  
   showStack: boolean;
   showButtons: boolean;
+  //showProjects?: boolean;
+  //showTasks?: boolean;
+  //showDetails?: boolean;
+    
   refreshInterval: number;
   filterValue: string;
   isDarkTheme: boolean;

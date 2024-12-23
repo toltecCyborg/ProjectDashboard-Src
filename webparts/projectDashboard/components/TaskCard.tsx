@@ -7,7 +7,7 @@ interface TaskCardProps {
   showDetails: boolean;
 }
 
-const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
+const TaskCard: React.FC<TaskCardProps> = ({ task, showDetails }) => {
   const getCardDelay = (delay: number, complete: number) => {
     if (complete === 1) return styles.blackFont;
     if (delay === 0) return styles.greenFont;
@@ -15,7 +15,6 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
     if (delay > 7) return styles.redFont;
     return styles.blackFont; // Default Class
   };
-
   return (
     <div className="task-card">
       <h1 className="task-title">{task.Task}</h1>
@@ -24,21 +23,9 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
         <tbody>
           <tr>
             <td>
-              <strong>Status:</strong>
-            </td>
-            <td>{task.Status}</td>
-          </tr>
-          <tr>
-            <td>
               <strong>Deliverable:</strong>
             </td>
             <td>{task.Deliverable}</td>
-          </tr>
-          <tr>
-            <td>
-              <strong>Gate:</strong>
-            </td>
-            <td>{task.Title}</td>
           </tr>
           <tr
             className={`${styles["task-card"]} ${getCardDelay(
@@ -93,24 +80,40 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
             </td>
             <td>{task.Effort}</td>
           </tr>
-          <tr>
-            <td>
-              <strong>Barriers:</strong>
-            </td>
-            <td>{task.Barriers}</td>
-          </tr>
-          <tr>
-            <td>
-              <strong>ActionableStatus:</strong>
-            </td>
-            <td>{task.ActionableStatus}</td>
-          </tr>
-          <tr>
-            <td>
-              <strong>Description:</strong>
-            </td>
-            <td>{task.Description}</td>
-          </tr>
+          {showDetails && (
+            <>
+              <tr>
+                <td>
+                  <strong>Barriers:</strong>
+                </td>
+                <td>{task.Barriers}</td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>ActionableStatus:</strong>
+                </td>
+                <td>{task.ActionableStatus}</td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Status:</strong>
+                </td>
+                <td>{task.Status}</td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Gate:</strong>
+                </td>
+                <td>{task.Title}</td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Description:</strong>
+                </td>
+                <td>{task.Description}</td>
+              </tr>
+            </>
+          )}
           {false && (
             <tr>
               <td>

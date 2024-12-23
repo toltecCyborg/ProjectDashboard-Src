@@ -1,22 +1,44 @@
 import * as React from "react";
-import { IGateListItem } from "../../../models";
+import { IGateListItem, ITaskListItem } from "../../../models";
 import styles from "./ProjectDashboard.module.scss";
+import { ProgressIndicator, IProgressIndicatorStyles } from "@fluentui/react";
 
 interface GateCardProps {
   gates: IGateListItem[];
+  tasks: ITaskListItem[];
+  showDetails: boolean;
   onSelectItem: (item: string, group: string) => void;
 }
-const ProgressGates = ({ gates, onSelectItem }: GateCardProps) => {
-  //Hook
+const ProgressGates = ({
+  gates,
+  onSelectItem,
+  showDetails,
+  tasks,
+}: GateCardProps) => {
+  const progressStyles: IProgressIndicatorStyles = {
+    itemProgress: {
+      backgroundColor: "whitesmoke", // Color de la barra
+      height: "2px"
+    },
+    root: {
+      margin: "1px", // Ejemplo: ajustando margen
+    },
+    itemName: "gates",
+    itemDescription: "gates progress bar...",
+    progressBar: "bar",
+    progressTrack: "track",
+  };
   const getCardClass = (delay: number, complete: number) => {
     if (complete === 1) return styles.green;
+    if (delay > 0 && delay <= 7) return styles.yellow;
+    if (delay > 7) return styles.red;
     return styles.white; // Default Class
   };
   const getCardDelay = (delay: number, complete: number) => {
     if (complete === 1) return styles.whiteFont;
     if (delay === 0) return styles.greenFont;
-    if (delay > 0 && delay <= 7) return styles.yellowFont;
-    if (delay > 7) return styles.redFont;
+    if (delay > 0 && delay <= 7) return styles.redFont;
+    if (delay > 7) return styles.whiteFont;
     return styles.whiteFont; // Default Class
   };
   return (
@@ -39,6 +61,14 @@ const ProgressGates = ({ gates, onSelectItem }: GateCardProps) => {
                 onSelectItem(gate.Title, "gate");
               }}
             >
+              {showDetails && tasks.length > 0 && (
+                <ProgressIndicator
+                  //label="Loading..."
+                  //description="We are fetching the data"
+                  percentComplete={gate.Complete}
+                  styles={progressStyles}
+                />
+              )}
               <h5>
                 <strong>{gate.Title} </strong>
               </h5>

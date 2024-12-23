@@ -3,7 +3,7 @@ import styles from "./ProjectDashboard.module.scss";
 import type { IProjectDashboardProps } from "./IProjectDashboardProps";
 import { escape } from "@microsoft/sp-lodash-subset";
 import ListProject from "./ListProject";
-
+//import { useState } from "react";
 import { Switch } from "@fluentui/react-components";
 import StackGates from "./StackGates";
 import ProgressTasks from "./ProgressTasks";
@@ -12,10 +12,37 @@ import TaskCard from "./TaskCard";
 import ListTasks from "./ListTasks";
 //import type { SwitchProps } from "@fluentui/react-components";
 
-export default class ProjectDashboard extends React.Component<IProjectDashboardProps> {
+interface IProjectDashboardState {
+  // showProjects: boolean;
+  // showTasks: boolean;
+  showDetails: boolean;
+}
+
+export default class ProjectDashboard extends React.Component<
+  IProjectDashboardProps,
+  IProjectDashboardState
+> {
   private _showProjects: boolean = false;
   private _showTasks: boolean = false;
-  private _showDetails: boolean;
+  //private _showDetails: boolean = false;
+  constructor(props) {
+    super(props);
+    this.state = {
+      // showProjects: false,
+      // showTasks: false,
+      showDetails: false,
+    };
+  }
+
+  // handleSwitchTaskChange = (event) => {
+  //   this.setState({ showTasks: event.target.checked });
+  // };
+  // handleSwitchProjectChange = (event) => {
+  //   this.setState({ showProjects: event.target.checked });
+  // };
+  handleSwitchDetailsChange = (event) => {
+    this.setState({ showDetails: event.target.checked });
+  };
 
   public render(): React.ReactElement<IProjectDashboardProps> {
     const {
@@ -25,6 +52,8 @@ export default class ProjectDashboard extends React.Component<IProjectDashboardP
       hasTeamsContext,
     } = this.props;
 
+    const { showDetails } = this.state;
+
     return (
       <section
         className={`${styles.projectDashboard} ${
@@ -33,27 +62,30 @@ export default class ProjectDashboard extends React.Component<IProjectDashboardP
       >
         {this.props.showButtons && (
           <div className={styles.buttons}>
-            {/* <button type="button" onClick={this.onGetTaskListItemsClicked}>
-              Show Tasks
-            </button>
-            <button type="button" onClick={this.onGetProjectListItemsClicked}>
-              Show Projects
-            </button> */}
-
             <Switch
               label="Show Tasks"
+              checked={this._showTasks}
               onChange={(ev) => {
                 this._showTasks = ev.currentTarget.checked;
+                //this.handleSwitchTaskChange(ev.currentTarget.checked);
                 this.onGetTaskListItemsChanged();
               }}
             />
             <Switch
               label="Show Projects"
+              checked={this._showProjects}
               onChange={(ev) => {
                 this._showProjects = ev.currentTarget.checked;
+                //this.handleSwitchProjectChange(ev.currentTarget.checked);
                 this.onGetProjectListItemsChanged();
               }}
+              // onChange={(ev) => {
+              //   this._showProjects = ev.currentTarget.checked;
+              //   //this.handleSwitchProjectChange(ev.currentTarget.checked);
+              //   //this.onGetProjectListItemsChanged();
+              // }}
             />
+
             <button
               type="button"
               onClick={() => {
@@ -63,26 +95,33 @@ export default class ProjectDashboard extends React.Component<IProjectDashboardP
               Reset
             </button>
             <Switch
-              label="Detailed"
-              onChange={(ev) => {
-                this._showDetails = ev.currentTarget.checked;
-              }}
+              label="Show Detail"
+              checked={showDetails}
+              onChange={this.handleSwitchDetailsChange}
             />
+            {/* <p>showProjects: {showProjects ? "true" : "false"}</p>
+            <p>showTasks: {showTasks ? "true" : "false"}</p>
+            <p>ShowDetails: {showDetails ? "true" : "false"}</p> */}
           </div>
         )}
         <div className="columnContainer">
-          <h2>
-            {this.props.description + " "}
-            <strong>{escape(this.props.projectName)}</strong>{" "}
-          </h2>
+          {true && (
+            <h2>
+              {this.props.description + " "}
+              <strong>{escape(this.props.projectName)}</strong>{" "}
+            </h2>
+          )}
+
           <div>
             {!this.props.showStack && spGateListItems && (
               <ProgressGates
                 gates={spGateListItems}
+                tasks={spTaskListItems}
                 onSelectItem={(item, group) => {
                   this.props.onSelectItem(item, group);
-                  this._showDetails = true;
+                  //this._showDetails = true;
                 }}
+                showDetails={showDetails}
               />
             )}
             {this.props.showStack && spGateListItems && (
@@ -98,7 +137,7 @@ export default class ProjectDashboard extends React.Component<IProjectDashboardP
             {spTaskListItems.length > 0 && (
               <ProgressTasks
                 tasks={spTaskListItems}
-                showDetails={this._showDetails}
+                showDetails={showDetails}
                 onSelectItem={(item, group) => {
                   this.props.onSelectItem(item, group);
                 }}
@@ -112,7 +151,7 @@ export default class ProjectDashboard extends React.Component<IProjectDashboardP
             <>
               <TaskCard
                 task={this.props.selectedTask}
-                showDetails={this._showDetails}
+                showDetails={showDetails}
               />
             </>
           )}
@@ -171,23 +210,6 @@ export default class ProjectDashboard extends React.Component<IProjectDashboardP
   private onGetTaskListItemsChanged = (): void => {
     if (this.props.onGetTaskListItems) this.props.onGetTaskListItems();
   };
-
-  // private onGetProjectListItemsClicked = (
-  //   event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  // ): void => {
-  //   event.preventDefault();
-  //   this._showProjects = !this._showProjects;
-  //   if (this.props.onGetProjectListItems) this.props.onGetProjectListItems();
-  // };
-
-  // private onGetTaskListItemsClicked = (
-  //   event: React.MouseEvent<HTMLButtonElement, MouseEvent>
-  // ): void => {
-  //   event.preventDefault();
-
-  //   this._showTasks = !this._showTasks;
-  //   if (this.props.onGetTaskListItems) this.props.onGetTaskListItems();
-  // };
 
   componentDidMount(): void {
     // Cargar datos al iniciar
