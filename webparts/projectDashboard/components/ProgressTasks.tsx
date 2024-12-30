@@ -44,7 +44,7 @@ const ProgressTasks = ({ onSelectItem, showDetails, tasks }: GateCardProps) => {
           {tasks.map((item, index) => (
             <div
               key={item.Id}
-              className={`${styles["pilaCard"]} ${getCardClass(
+              className={`${styles["ed2Card"]} ${getCardClass(
                 item.Delay,
                 item.Complete
               )}`}

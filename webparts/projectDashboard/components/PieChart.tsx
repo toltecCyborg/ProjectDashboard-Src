@@ -1,31 +1,42 @@
 import React from "react";
 import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, Title } from "chart.js";
+import { IGateListItem } from "../../../models";
 
-// Registrar componentes necesarios en ChartJS
 ChartJS.register(ArcElement, Tooltip, Legend, Title);
 
-const PieChart: React.FC = () => {
+interface PieProps {
+  gates: IGateListItem[];
+}
+
+const PieChart: React.FC<PieProps> = ({ gates }) => {
   // Datos para el gráfico
+  const getCardColor = (delay: number, complete: number) => {
+    console.log("Styles:" + delay + "-" + complete);
+    if (complete === 1) return "#4CAF50";
+    if (delay > 0 && delay <= 7) return "#FFCE56";
+    if (delay > 7) return "#FF3B4E";
+    return "#FFFFFF"; // Default Class
+  };
+  const getCardBackground = (delay: number, complete: number) => {
+    console.log("BackStyles:" + delay + "-" + complete);
+    if (complete === 1) return "#4CAF50CC";
+    if (delay > 0 && delay <= 7) return "#FFCE56CC";
+    if (delay > 7) return "#FF6384CC";
+    return "#CCCCCC80"; // Default Class
+  };
   const data = {
-    labels: ["Rojo", "Azul", "Amarillo", "Verde", "Púrpura"],
+    //labels: ["Rojo", "Azul", "Amarillo", "Verde", "Púrpura"],
+    labels: gates.map((gate, index) => gate.Title),
     datasets: [
       {
-        data: [12, 19, 3, 5, 2], // Valores
-        backgroundColor: [
-          "#FF6384", // Rojo
-          "#36A2EB", // Azul
-          "#FFCE56", // Amarillo
-          "#4CAF50", // Verde
-          "#8E44AD", // Púrpura
-        ], // Colores para cada segmento
-        hoverBackgroundColor: [
-          "#FF6384CC",
-          "#36A2EBCC",
-          "#FFCE56CC",
-          "#4CAF50CC",
-          "#8E44ADCC",
-        ], // Colores al hacer hover
+        data: [20, 20, 20, 20, 20], // Valores
+        backgroundColor: gates.map((gate, index) =>
+          getCardColor(gate.Delay, gate.Complete)
+        ), // Colores para cada segmento
+        hoverBackgroundColor: gates.map((gate, index) =>
+          getCardBackground(gate.Delay, gate.Complete)
+        ), // Colores al hacer hover
       },
     ],
   };
@@ -35,17 +46,17 @@ const PieChart: React.FC = () => {
     responsive: true,
     plugins: {
       legend: {
-        position: "top" as const, // Coloca la leyenda en la parte superior
+        position: "right" as const, // Coloca la leyenda en la parte superior
       },
       title: {
         display: true,
-        text: "Distribución de Colores", // Título del gráfico
+        text: "RF Cascade", // Título del gráfico
       },
     },
   };
 
   return (
-    <div style={{ width: "400px", margin: "0 auto" }}>
+    <div style={{ width: "300px", margin: "0 auto" }}>
       <Pie data={data} options={options} />
     </div>
   );

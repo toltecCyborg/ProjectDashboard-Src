@@ -19,7 +19,7 @@ export function GroupByGate(data: ITaskListItem[]): IGateListItem[] {
 
     // Actualizar métricas del grupo
     //const accumComplete = Math.(acc[Title].Complete, Complete);
-    acc[Title].Complete = Math.max(acc[Title].Complete, Complete);
+    acc[Title].Complete += Complete;
     acc[Title].Count += 1;
     acc[Title].Delay = Math.max(acc[Title].Delay, Delay);
 
@@ -30,7 +30,7 @@ export function GroupByGate(data: ITaskListItem[]): IGateListItem[] {
   // Convertir los grupos en un arreglo
   return Object.values(groups).map((group) => ({
     Title: group.Title,
-    Complete: group.Complete,
+    Complete: group.Complete/group.Count,
     Count: group.Count,
     Delay: group.Delay,
     Id: group.Id,

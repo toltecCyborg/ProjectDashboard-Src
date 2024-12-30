@@ -2,6 +2,7 @@ import * as React from "react";
 import { IGateListItem, ITaskListItem } from "../../../models";
 import styles from "./ProjectDashboard.module.scss";
 import { ProgressIndicator, IProgressIndicatorStyles } from "@fluentui/react";
+import PieChart from "./PieChart";
 
 interface GateCardProps {
   gates: IGateListItem[];
@@ -18,7 +19,7 @@ const ProgressGates = ({
   const progressStyles: IProgressIndicatorStyles = {
     itemProgress: {
       backgroundColor: "whitesmoke", // Color de la barra
-      height: "2px"
+      height: "2px",
     },
     root: {
       margin: "1px", // Ejemplo: ajustando margen
@@ -43,47 +44,53 @@ const ProgressGates = ({
   };
   return (
     <>
-      <div className={styles["cardContainer"]}>
-        {gates.map((gate, index) => (
-          <div
-            key={gate.Id}
-            className={`${styles["pilaCard"]} ${getCardClass(
-              gate.Delay,
-              gate.Complete
-            )}`}
-          >
+      {!showDetails ? (
+        <div className={styles["cardContainer"]}>
+          {gates.map((gate, index) => (
             <div
-              className={`${styles["cardContent"]} ${getCardDelay(
+              key={gate.Id}
+              className={`${styles["gateCard"]} ${getCardClass(
                 gate.Delay,
                 gate.Complete
               )}`}
-              onClick={() => {
-                onSelectItem(gate.Title, "gate");
-              }}
             >
-              {showDetails && tasks.length > 0 && (
-                <ProgressIndicator
-                  //label="Loading..."
-                  //description="We are fetching the data"
-                  percentComplete={gate.Complete}
-                  styles={progressStyles}
-                />
-              )}
-              <h5>
-                <strong>{gate.Title} </strong>
-              </h5>
-              <p>
-                <strong>{Math.floor(gate.Complete * 100)}% </strong>
-              </p>
-              {gate.Delay > 0 && (
+              <div
+                className={`${styles["cardContent"]} ${getCardDelay(
+                  gate.Delay,
+                  gate.Complete
+                )}`}
+                onClick={() => {
+                  onSelectItem(gate.Title, "gate");
+                }}
+              >
+                {showDetails && tasks.length > 0 && (
+                  <ProgressIndicator
+                    //label="Loading..."
+                    //description="We are fetching the data"
+                    percentComplete={gate.Complete}
+                    styles={progressStyles}
+                  />
+                )}
+                <h5>
+                  <strong>{gate.Title} </strong>
+                </h5>
                 <p>
-                  <strong>(- {gate.Delay} days) </strong>
+                  <strong>{Math.floor(gate.Complete * 100)}% </strong>
                 </p>
-              )}
+                {gate.Delay > 0 && (
+                  <p>
+                    <strong>(- {gate.Delay} days) </strong>
+                  </p>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div>
+          <PieChart gates={gates} />
+        </div>
+      )}
     </>
   );
 };

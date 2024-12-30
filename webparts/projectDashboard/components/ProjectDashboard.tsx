@@ -34,12 +34,6 @@ export default class ProjectDashboard extends React.Component<
     };
   }
 
-  // handleSwitchTaskChange = (event) => {
-  //   this.setState({ showTasks: event.target.checked });
-  // };
-  // handleSwitchProjectChange = (event) => {
-  //   this.setState({ showProjects: event.target.checked });
-  // };
   handleSwitchDetailsChange = (event) => {
     this.setState({ showDetails: event.target.checked });
   };
