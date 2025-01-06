@@ -29,6 +29,20 @@ const ProgressGates = ({
     progressBar: "bar",
     progressTrack: "track",
   };
+
+  // const getBackgroundImage = (delay: number, complete: number): string => {
+  //   return "";
+  //   if (complete === 1) {
+  //     return styles.arrowCardWhite;
+  //   } else if (delay >= 14) {
+  //     return styles.arrowCardRed;
+  //   } else if (delay >= 7) {
+  //     return styles.arrowCardYellow;
+  //   } else {
+  //     return styles.arrowCardGreen;
+  //   }
+  // };
+
   const getCardClass = (delay: number, complete: number) => {
     if (complete === 1) return styles.green;
     if (delay > 0 && delay <= 7) return styles.yellow;
@@ -42,6 +56,7 @@ const ProgressGates = ({
     if (delay > 7) return styles.whiteFont;
     return styles.whiteFont; // Default Class
   };
+
   return (
     <>
       {!showDetails ? (
@@ -49,10 +64,13 @@ const ProgressGates = ({
           {gates.map((gate, index) => (
             <div
               key={gate.Id}
+              //className={styles["gateCard"]}
+              //className={`${styles["gateCard"]} ${getBackgroundImage(gate.Delay, gate.Complete)}`}
               className={`${styles["gateCard"]} ${getCardClass(
                 gate.Delay,
                 gate.Complete
               )}`}
+              //className={`${getBackgroundImage(gate.Delay, gate.Complete)}`}
             >
               <div
                 className={`${styles["cardContent"]} ${getCardDelay(

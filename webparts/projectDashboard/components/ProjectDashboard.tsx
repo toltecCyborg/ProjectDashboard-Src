@@ -80,14 +80,6 @@ export default class ProjectDashboard extends React.Component<
               // }}
             />
 
-            <button
-              type="button"
-              onClick={() => {
-                this.onReset();
-              }}
-            >
-              Reset
-            </button>
             <Switch
               label="Show Detail"
               checked={showDetails}
@@ -98,14 +90,27 @@ export default class ProjectDashboard extends React.Component<
             <p>ShowDetails: {showDetails ? "true" : "false"}</p> */}
           </div>
         )}
-        <div className="columnContainer">
-          {true && (
-            <h2>
-              {this.props.description + " "}
-              <strong>{escape(this.props.projectName)}</strong>{" "}
-            </h2>
-          )}
-
+        <div className={styles["columnContainer"]}>
+          <div className={styles["rowContainer"]}>
+            <button
+              type="button"
+              onClick={() => {
+                this.onReset();
+              }}
+            >
+              <img
+                alt=""
+                src={require("../assets/Restart.jpg")}
+                className={styles["iconImage"]}
+              />
+            </button>
+            <div>
+              <h2>
+                {this.props.description + " "}
+                <strong>{escape(this.props.projectName)}</strong>{" "}
+              </h2>
+            </div>
+          </div>
           <div>
             {!this.props.showStack && spGateListItems && (
               <ProgressGates
@@ -188,7 +193,7 @@ export default class ProjectDashboard extends React.Component<
   }
 
   private onReset(): void {
-    //this._showDetails = false;
+    //showDetails = false;
     if (this.props.onGetGateListItems) this.props.onGetGateListItems();
 
     console.log("ProjectDashboar-onReset...");

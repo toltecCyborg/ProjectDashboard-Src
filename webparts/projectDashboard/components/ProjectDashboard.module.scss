@@ -21,6 +21,11 @@
   max-width: 420px;
 }
 
+.iconImage {
+  width: 100%;
+  max-width: 20px;
+}
+
 .links {
   a {
     text-decoration: none;
@@ -57,21 +62,23 @@ h2 {
 .cardContainer {
   display: flex;
   flex-direction: row;
-  gap: 2px;
+  gap: 5px;
   padding: 2px;
-  margin: 0px;
-  min-height: 100px;
+  margin: 2px;
+  min-height: 90px;
   justify-content: start;
   align-items: start;
   overflow: auto;
 }
 .gateCard {
-  background-color: whitesmoke;
+  //background-color: whitesmoke;
+  background-size: "cover";
+  background-image: '../assets/ArrowGreen.jpg';
   border-radius: 0px;
   border-color:#333;
   box-shadow: 0 4px 6px rgba(8, 8, 8, 0.89);
-  width: 70px;
-  height: 70px;
+  width: 80px;
+  height: 80px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -146,10 +153,44 @@ h2 {
   display: flex;
   flex-direction: row;
 }
+
 .columnContainer {
   display: flex;
   flex-direction: column;
 }
+
+.arrowCard {
+  background-size: "cover";
+  color: "#fff"; // Texto blanco para visibilidad
+  padding: 20px;
+  border-radius: 8px;
+  text-align: "center";
+  height: 200px; // Ajusta el tamaño según tu diseño
+  width: 300px;
+  display: "flex";
+  flex-direction: "column";
+  justify-content: "center";
+  box-shadow: "0 4px 6px rgba(0,0,0,0.1)";
+  background-image: 'https://ed2corp.sharepoint.com/Shared%20Documents/imagenes/ArrowGreen.jpg';
+};
+
+.arrowCardRed {
+  background-size: "cover";
+  background-image: 'https://ed2corp.sharepoint.com/sites/SiteAssets/imagenes/ArrowRed.jpg';
+}
+.arrowCardYellow {
+  background-size: "cover";
+  background-image: 'https://ed2corp.sharepoint.com/Shared%20Documents/imagenes/ArrowGreen.jpg';
+}
+.arrowCardGreen {
+  background-size: "cover";
+  background-image: '../assets/ArrowGreen.jpg';
+}
+.arrowCardWhite {
+  background-size: "cover";
+  background-image: 'https://ed2corp.sharepoint.com/sites/SiteAssets/imagenes/ArrowWhite.jpg';
+}
+
 
 
 .ed2Card {
