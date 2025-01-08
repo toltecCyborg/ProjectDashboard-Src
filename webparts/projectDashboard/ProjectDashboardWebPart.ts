@@ -15,6 +15,7 @@ import { IReadonlyTheme} from '@microsoft/sp-component-base';
 import * as strings from 'ProjectDashboardWebPartStrings';
 
 import ProjectDashboard from './components/ProjectDashboard';
+import Dashboard from './components/Dashboard';
 import { GroupByGate, FilterTasks, IProjectDashboardProps } from './components';
 
 import { SPHttpClient } from '@microsoft/sp-http';
@@ -31,7 +32,9 @@ export interface ISPList {
   Title: string;
   Id: string;
 }
-
+export interface DashboardProps {
+  gates: IGateListItem[];
+}
 
 export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProjectDashboardWebPartProps> {
 
@@ -42,10 +45,11 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
   private _isDarkTheme: boolean = false;
   private _environmentMessage: string = '';
 
+ 
   //public _selectedFilter: DynamicProperty<string>;
 
   public render(): void {
-    const element: React.ReactElement<IProjectDashboardProps> = React.createElement(
+    const progressBar: React.ReactElement<IProjectDashboardProps> = React.createElement(
       ProjectDashboard,
       {
         spGateListItems: this._gates,
@@ -71,13 +75,29 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
         userDisplayName: this.context.pageContext.user.displayName
       }
     );
-    
+
+    const dashboard: React.ReactElement<DashboardProps> = React.createElement(
+      Dashboard,
+      {  
+        gates: this._gates,
+        project: this.properties.projectName
+      }
+    );
+
+
     if(this.properties.showButtons) console.log("Log Message:" + this._getEnvironmentMessage() );
-    ReactDom.render(element, this.domElement);
+
+    if(this.properties.isDashboard)
+      ReactDom.render(dashboard, this.domElement);
+    else
+      ReactDom.render(progressBar, this.domElement);
+
   }
 
-  protected onInit(): Promise<void> {
+  protected async onInit(): Promise<void> {
     this.context.dynamicDataSourceManager.initializeSource(this);
+    await this._onGetGateListItems(); 
+    //await this._onGetProjectListItems();     
     return super.onInit();
   }
 
@@ -135,6 +155,14 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
   }
 
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
+    const dropdownOptions = this._projects.map((project, index) => ({
+      key: project.Title,    
+      text: project.Title
+    }));
+    if (!this.properties.projectName && dropdownOptions.length > 0) {
+      this.properties.projectName = dropdownOptions[0].key; // Selecciona el primer key por defecto
+    }
+
     return {
       pages: [
         {
@@ -147,13 +175,15 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
               groupFields: [              
                 PropertyPaneDropdown('projectName', {
                   label: 'Select Project',
-                  options: [
-                    { key: 'RF Cascade', text: 'RF Cascade' },
-                    { key: 'PAM', text: 'PAM' },
-                    { key: 'Heatmap', text: 'Heatmap' },
-                    { key: 'Freestar', text: 'Freestar' }
-                  ]}),
-                  PropertyPaneCheckbox('showStack', {
+                  options: dropdownOptions,
+                  selectedKey: this.properties.projectName,
+                }),
+                PropertyPaneToggle('isDashboard', {
+                    label: 'Is Dashboard',
+                    onText: 'On',
+                    offText: 'Off'
+                  }),
+                   PropertyPaneCheckbox('showStack', {
                     text: 'As Stack (default As Progress Bar)'
                   }),
                   PropertyPaneTextField('description', {
@@ -196,10 +226,22 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
     if (propertyPath === 'filterValue') {
       this.context.dynamicDataSourceManager.notifyPropertyChanged('filterValue');
     }
-    super.onPropertyPaneFieldChanged(propertyPath, oldValue, newValue);
+    if (propertyPath === 'projectName' && newValue !== oldValue) {
+      console.log(`Selected Project Changed: ${newValue}`); // Maneja el evento
+      this.properties.projectName = newValue; // Actualiza el valor
+      this._onProjectChange(newValue); // Dispara tu función personalizada
+    }
+      super.onPropertyPaneFieldChanged(propertyPath, oldValue, newValue);
   }
   
-  
+
+// Método personalizado para manejar el cambio
+private async _onProjectChange(projectName: string): Promise<void> {
+  // Aquí puedes agregar la lógica personalizada que necesites ejecutar.
+  console.log(`Handling project change: ${projectName}`);
+  // Ejemplo: Recargar datos específicos según el proyecto
+  await this._onGetGateListItems();
+}
   /** */
 
   private getListName (planName: string): string { 

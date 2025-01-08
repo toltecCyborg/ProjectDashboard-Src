@@ -110,6 +110,7 @@ export default class ProjectDashboard extends React.Component<
                 <strong>{escape(this.props.projectName)}</strong>{" "}
               </h2>
             </div>
+            
           </div>
           <div>
             {!this.props.showStack && spGateListItems && (
