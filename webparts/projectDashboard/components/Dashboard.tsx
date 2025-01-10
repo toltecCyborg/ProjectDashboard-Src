@@ -1,16 +1,17 @@
 import React from "react";
-import { IGateListItem } from "../../../models";
+import { IGateListItem, IProjectListItem } from "../../../models";
 import { GroupByProject } from "./GroupByProject";
 //import styles from "./ProjectDashboard.module.scss";
 
 interface DashboardProps {
   gates: IGateListItem[];
-  project : string;
+  project : IProjectListItem;
+  baseURL : string;
 }
 
 //const Dashboard: React.FC<TaskCardProps> = ({ gates, showDetails }) => {
 
-const Dashboard: React.FC<DashboardProps> = ({ gates, project }) => {
+const Dashboard: React.FC<DashboardProps> = ({ gates, project, baseURL }) => {
   const getCardColor = (delay: number, complete: number) => {
     if (complete === 1) return "green";
     if (delay > 0 && delay <= 7) return "yellow";
@@ -26,28 +27,38 @@ const Dashboard: React.FC<DashboardProps> = ({ gates, project }) => {
     return "black"; // Default Class
   };
 
+  const getCardBorder = (delay: number, complete: number) => {
+    if (complete === 1) return "white";
+    if (delay === 0) return "grey";
+    if (delay > 0 && delay <= 7) return "white";
+    if (delay > 7) return "white";
+    return "grey"; // Default Class
+  };
   return (
     <div className="task-card">
       <div>
         <a
-          href="https://ed2corp.sharepoint.com/sites/ED2Team/SitePages/SW_RFCascade.aspx"
+//          href="https://ed2corp.sharepoint.com/sites/ED2Team/SitePages/SW_RFCascade.aspx"
+          href={project.Link.Url}
           target="_blank"
+          
         >
-          <h1> {project} </h1>
+          {console.log("project.link: "+project.Link.Url)}
+          <h1> {project.Title} </h1>
           {gates && (
             <div className="task-card">              
               <svg
                 width="200"
                 height="200"
                 xmlns="http://www.w3.org/2000/svg"
-                style={{ border: "2px solid blue" }}
+                //style={{ border: "2px solid grey ", borderRadius: "10px", padding:"5px" }}
               >
                 <circle
                   cx="100"
                   cy="100"
                   r="80"
                   fill="white"
-                  stroke="black"
+                  stroke="grey"
                   strokeWidth="2"
                 />
                 <rect
@@ -57,7 +68,7 @@ const Dashboard: React.FC<DashboardProps> = ({ gates, project }) => {
                   width="50"
                   height="50"
                   fill={getCardColor(gates[0].Delay, gates[0].Complete)}
-                  stroke="black"
+                  stroke={getCardBorder(gates[0].Delay, gates[0].Complete)}
                   strokeWidth="2"
                 />
                 <rect
@@ -67,7 +78,7 @@ const Dashboard: React.FC<DashboardProps> = ({ gates, project }) => {
                   width="50"
                   height="50"
                   fill={getCardColor(gates[1].Delay, gates[1].Complete)}
-                  stroke="black"
+                  stroke={getCardBorder(gates[1].Delay, gates[1].Complete)}
                   strokeWidth="2"
                 />
                 <rect
@@ -77,7 +88,7 @@ const Dashboard: React.FC<DashboardProps> = ({ gates, project }) => {
                   width="50"
                   height="50"
                   fill={getCardColor(gates[2].Delay, gates[2].Complete)}
-                  stroke="black"
+                  stroke={getCardBorder(gates[2].Delay, gates[2].Complete)}
                   strokeWidth="2"
                 />
                 <rect
@@ -87,7 +98,7 @@ const Dashboard: React.FC<DashboardProps> = ({ gates, project }) => {
                   width="50"
                   height="50"
                   fill={getCardColor(gates[3].Delay, gates[3].Complete)}
-                  stroke="black"
+                  stroke={getCardBorder(gates[3].Delay, gates[3].Complete)}
                   strokeWidth="2"
                 />
                 <rect
@@ -97,8 +108,8 @@ const Dashboard: React.FC<DashboardProps> = ({ gates, project }) => {
                   width="50"
                   height="50"
                   fill={getCardColor(gates[4].Delay, gates[4].Complete)}
-                  stroke="black"
-                  strokeWidth="2"
+                  stroke={getCardBorder(gates[4].Delay, gates[4].Complete)}
+                  strokeWidth="1"
                 />
 
                 <text x="100" y="35" fill={getCardDelay(gates[0].Delay, gates[0].Complete)} font-size="24">

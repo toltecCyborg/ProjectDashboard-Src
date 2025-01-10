@@ -1,7 +1,6 @@
 import * as React from "react";
 import { ITaskListItem } from "../../../models";
 import styles from "./ProjectDashboard.module.scss";
-import { ProgressIndicator, IProgressIndicatorStyles } from "@fluentui/react";
 
 interface GateCardProps {
   tasks: ITaskListItem[];
@@ -12,18 +11,7 @@ const ProgressTasks = ({ onSelectItem, showDetails, tasks }: GateCardProps) => {
   //let _showDetails: boolean = false;
   //Hook
   //const tasks: ITaskListItem[] = [];
-  const progressStyles: IProgressIndicatorStyles = {
-    itemProgress: {
-      backgroundColor: "whitesmoke", // Color de la barra
-    },
-    root: {
-      marginBottom: "1px", // Ejemplo: ajustando margen
-    },
-    itemName: "gates",
-    itemDescription: "almost there...",
-    progressBar: "bar",
-    progressTrack: "track",
-  };
+ 
   const getCardClass = (delay: number, complete: number) => {
     if (complete === 1) return styles.green;
     if (delay > 0 && delay <= 7) return styles.yellow;
@@ -57,11 +45,7 @@ const ProgressTasks = ({ onSelectItem, showDetails, tasks }: GateCardProps) => {
                 onClick={() => {
                   onSelectItem(item.Task, "task");
                 }}
-              >
-                <ProgressIndicator
-                  percentComplete={item.Complete} // Progreso como fracción (0.5 = 50%)
-                  styles={progressStyles}
-                />
+              >                
                 <p>
                   <strong>{Math.floor(item.Complete * 100)}% </strong>
                 </p>

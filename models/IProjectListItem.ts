@@ -3,5 +3,8 @@ export interface IProjectListItem {
     Title: string;
     Status: string;
     ListName: string,
-    Link: string;
+    Link: {
+      Url: string,
+      Description: string
+    }
   } 

@@ -1,8 +1,8 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import * as React from "react";
 import { IGateListItem, ITaskListItem } from "../../../models";
 import styles from "./ProjectDashboard.module.scss";
 import { ProgressIndicator, IProgressIndicatorStyles } from "@fluentui/react";
-import PieChart from "./PieChart";
 
 interface GateCardProps {
   gates: IGateListItem[];
@@ -30,18 +30,17 @@ const ProgressGates = ({
     progressTrack: "track",
   };
 
-  // const getBackgroundImage = (delay: number, complete: number): string => {
-  //   return "";
-  //   if (complete === 1) {
-  //     return styles.arrowCardWhite;
-  //   } else if (delay >= 14) {
-  //     return styles.arrowCardRed;
-  //   } else if (delay >= 7) {
-  //     return styles.arrowCardYellow;
-  //   } else {
-  //     return styles.arrowCardGreen;
-  //   }
-  // };
+  const getBackgroundImage = (delay: number, complete: number) => {
+    if (complete === 1) {
+      return require("../assets/ArrowGreen.png");
+    } else if (delay >= 14) {
+      return require("../assets/ArrowRed.png");
+    } else if (delay >= 7) {
+      return require("../assets/ArrowYellow.png");
+    } else {
+      return require("../assets/ArrowWhite.png");
+    }
+  };
 
   const getCardClass = (delay: number, complete: number) => {
     if (complete === 1) return styles.green;
@@ -59,14 +58,14 @@ const ProgressGates = ({
 
   return (
     <>
-      {!showDetails ? (
+      {showDetails ? (
         <div className={styles["cardContainer"]}>
           {gates.map((gate, index) => (
             <div
               key={gate.Id}
               //className={styles["gateCard"]}
               //className={`${styles["gateCard"]} ${getBackgroundImage(gate.Delay, gate.Complete)}`}
-              className={`${styles["gateCard"]} ${getCardClass(
+              className={`${styles["gateCardDetail"]} ${getCardClass(
                 gate.Delay,
                 gate.Complete
               )}`}
@@ -81,7 +80,7 @@ const ProgressGates = ({
                   onSelectItem(gate.Title, "gate");
                 }}
               >
-                {showDetails && tasks.length > 0 && (
+                {tasks.length > 0 && (
                   <ProgressIndicator
                     //label="Loading..."
                     //description="We are fetching the data"
@@ -105,8 +104,51 @@ const ProgressGates = ({
           ))}
         </div>
       ) : (
-        <div>
-          <PieChart gates={gates} />
+        <div className={styles["cardContainer"]}>
+          {gates.map((gate, index) => (
+            <div
+              style={{ position: "relative", width: "80px", height: "80px" }}
+              key={gate.Id}
+            >
+              <img
+                alt=""
+                //src={require("../assets/ArrowGreen.jpg")}
+                src={getBackgroundImage(gate.Delay, gate.Complete)}
+                className={styles["iconArrow"]}
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  top: "10%",
+                  left: "20%",
+                  //transform: "translate(-50%, -50%)",
+                  // color: "white",
+                  // fontSize: "20px",
+                  // fontWeight: "bold",
+                  //textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)"
+                }}
+                className={`${styles["cardContent"]} ${getCardDelay(
+                  gate.Delay,
+                  gate.Complete
+                )}`}
+                onClick={() => {
+                  onSelectItem(gate.Title, "gate");
+                }}
+              >
+                <h5>
+                  <strong>{gate.Title} </strong>
+                </h5>
+                <p>
+                  <strong>{Math.floor(gate.Complete * 100)}% </strong>
+                </p>
+                {gate.Delay > 0 && (
+                  <p>
+                    <strong>(- {gate.Delay} days) </strong>
+                  </p>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </>

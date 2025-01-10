@@ -16,6 +16,8 @@ import * as strings from 'ProjectDashboardWebPartStrings';
 
 import ProjectDashboard from './components/ProjectDashboard';
 import Dashboard from './components/Dashboard';
+import ErrorPage from './components/ErrorPage';
+
 import { GroupByGate, FilterTasks, IProjectDashboardProps } from './components';
 
 import { SPHttpClient } from '@microsoft/sp-http';
@@ -32,8 +34,14 @@ export interface ISPList {
   Title: string;
   Id: string;
 }
-export interface DashboardProps {
+interface DashboardProps {
   gates: IGateListItem[];
+  project : IProjectListItem;
+  baseURL : string;
+}
+interface ErrorPageProps {
+  project : string;
+  errorMsg: string;
 }
 
 export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProjectDashboardWebPartProps> {
@@ -44,8 +52,9 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
   private _gates: IGateListItem[] = [];
   private _isDarkTheme: boolean = false;
   private _environmentMessage: string = '';
+  private _projectSelected: IProjectListItem ;
+  private _sysError: boolean = false;
 
- 
   //public _selectedFilter: DynamicProperty<string>;
 
   public render(): void {
@@ -80,17 +89,30 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
       Dashboard,
       {  
         gates: this._gates,
-        project: this.properties.projectName
+        project: this._projectSelected,
+        baseURL: this.context.pageContext.web.absoluteUrl
       }
     );
 
+    const errorPage: React.ReactElement<ErrorPageProps> = React.createElement(
+      ErrorPage,
+      {  
+        project: this.properties.projectName,
+        errorMsg: this._environmentMessage
+      }
+    );
 
     if(this.properties.showButtons) console.log("Log Message:" + this._getEnvironmentMessage() );
 
-    if(this.properties.isDashboard)
-      ReactDom.render(dashboard, this.domElement);
-    else
-      ReactDom.render(progressBar, this.domElement);
+    if(this._sysError) {
+      ReactDom.render(errorPage, this.domElement);
+    }
+    else {
+      if(this.properties.isDashboard)
+        ReactDom.render(dashboard, this.domElement);
+      else
+        ReactDom.render(progressBar, this.domElement);  
+    }
 
   }
 
@@ -222,37 +244,47 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
     return '';
   }
 
-  protected onPropertyPaneFieldChanged(propertyPath: string, oldValue: string, newValue: string): void {
+  protected async onPropertyPaneFieldChanged(propertyPath: string, oldValue: string, newValue: string): Promise<void> {
     if (propertyPath === 'filterValue') {
       this.context.dynamicDataSourceManager.notifyPropertyChanged('filterValue');
     }
     if (propertyPath === 'projectName' && newValue !== oldValue) {
       console.log(`Selected Project Changed: ${newValue}`); // Maneja el evento
       this.properties.projectName = newValue; // Actualiza el valor
-      this._onProjectChange(newValue); // Dispara tu función personalizada
+      await this._onProjectChange(newValue); // Dispara tu función personalizada
     }
       super.onPropertyPaneFieldChanged(propertyPath, oldValue, newValue);
   }
   
 
-// Método personalizado para manejar el cambio
-private async _onProjectChange(projectName: string): Promise<void> {
-  // Aquí puedes agregar la lógica personalizada que necesites ejecutar.
-  console.log(`Handling project change: ${projectName}`);
-  // Ejemplo: Recargar datos específicos según el proyecto
-  await this._onGetGateListItems();
-}
+
   /** */
+  
+  // Método personalizado para manejar el cambio
+  private async _onProjectChange(projectName: string): Promise<void> {
+    // Aquí puedes agregar la lógica personalizada que necesites ejecutar.
+    console.log(`Handling project change: ${projectName}`);
+    // Ejemplo: Recargar datos específicos según el proyecto
+    await this._onGetGateListItems();
+  }
 
-  private getListName (planName: string): string { 
+  private _getProjectInfo (planName: string): IProjectListItem { 
     const result  =  this._projects.find((item) => item.Title === planName) ;
-    let findPlanByName =  "PlanCascade";
-    if(result !== undefined)
-       findPlanByName = result.ListName;
-
-    console.log("getListName: "+ this.properties.projectName +" - result: "+result?.ListName+ " Final: "+findPlanByName);
-   
-    return findPlanByName;
+    if(result !== undefined){
+      this._projectSelected = result;
+      console.log("_getProjectInfo: "+ this.properties.projectName +" - result: "+result?.ListName+ " Final: "+this._projectSelected.ListName+ " Link: "+ this._projectSelected.Link.Url);
+      return result;
+    } else{
+      console.log("_getProjectInfo - planName not found: "+ this.properties.projectName );
+      const nullProj : IProjectListItem = {
+        Id: "",
+        Title: "", 
+        Status: "", 
+        ListName: "", 
+        Link: {Url:"", Description:""}
+      };
+      return nullProj ;
+    }   
   }
 
   private _onGetProjectListItems = async (): Promise<void> => {
@@ -268,6 +300,7 @@ private async _onProjectChange(projectName: string): Promise<void> {
       SPHttpClient.configurations.v1);
   
     if (!response.ok) {
+      this._sysError = true;
       const responseText = await response.text();
       throw new Error(responseText);
     }
@@ -302,28 +335,39 @@ private async _onProjectChange(projectName: string): Promise<void> {
     this.render();
    }
 
-//  private async _getTaskListItems(project: string, grouper: string, filter : string ): Promise<ITaskListItem[]> {
-    private async _getTaskListItems(): Promise<ITaskListItem[]> {
+  private async _getTaskListItems(): Promise<ITaskListItem[]> {
 
-      console.log("ProjectName Gate: "+ this.properties.projectName);
-    
-      const response = await this.context.spHttpClient.get(
-      //this.context.pageContext.web.absoluteUrl + `/_api/web/lists/RF_Cascade/items?$select=Id,Title,Complete,Status,Delay`,
-      this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('PlanCascade')/items?$select=Id,Title,Complete,Status,Delay,Deliverable,Task,WBS,Description,Responsible,Start,Finish,Barriers, ActualFinish, Effort, ActionableStatus, EvidenceOfCompletion`,
-      SPHttpClient.configurations.v1);
-
-    if (!response.ok) {
-      const responseText = await response.text();
-      throw new Error(responseText);
-    }
-  
-    const responseJson = await response.json();
-    //console.log("Project: " + project + " Grouper: "+grouper+" Filter: "+filter);
-
-    return responseJson.value as ITaskListItem[];
+      console.log("ProjectName : "+ this.properties.projectName);
+      this._projectSelected = this._getProjectInfo(this.properties.projectName);
+      if(this._projectSelected.ListName.length > 0){
+        try {
+          const response = await this.context.spHttpClient.get(
+            //this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('PlanCascade')/items?$select=Id,Title,Complete,Status,Delay,Deliverable,Tasks,WBS`,
+            this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('`+this._projectSelected.ListName+`')/items?$select=Id,Title,Complete,Status,Delay,Deliverable,Task,WBS,Description,Responsible,Start,Finish,Barriers, ActualFinish, Effort, ActionableStatus, EvidenceOfCompletion`,
+            SPHttpClient.configurations.v1);
+        
+            const responseJson = await response.json();
+            //console.log("Project: " + project + " Grouper: "+grouper+" Filter: "+filter);
+        
+            return responseJson.value as ITaskListItem[];
+              //console.log(groupedArray);  
+        } catch (error) {
+          console.error("Error fetching gate list items:", error);
+          this._sysError = true;
+          this._environmentMessage = error;
+          this.render();  
+          return [];
+        }
+      }else{
+        console.error("List not found for:", this.properties.projectName);
+        this._sysError = true;
+        this.render();  
+        return [];
+      }
   }
 
   private _onGetGateListItems = async (): Promise<void> => {
+    this._sysError = false;
     this._projects = await this._getProjectListItems();
     this._tasks = await this._getTaskListItems();
     this._gates = await this._getGateListItems();
@@ -333,23 +377,39 @@ private async _onProjectChange(projectName: string): Promise<void> {
   }
 
   private async _getGateListItems(): Promise<IGateListItem[]> {
-    
-    const response = await this.context.spHttpClient.get(
-      //this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('PlanCascade')/items?$select=Id,Title,Complete,Status,Delay,Deliverable,Tasks,WBS`,
-      this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('`+this.getListName(this.properties.projectName)+`')/items?$select=Id,Title,Complete,Status,Delay,Deliverable,Task,WBS`,
-      SPHttpClient.configurations.v1);
-  
-    if (!response.ok) {
-      const responseText = await response.text();
-      throw new Error(responseText);
+    //const baseUrl = this.getBaseUrl();
+    this._projectSelected = this._getProjectInfo(this.properties.projectName);
+    if(this._projectSelected.ListName.length > 0){
+      try {
+        const response = await this.context.spHttpClient.get(
+          //this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('PlanCascade')/items?$select=Id,Title,Complete,Status,Delay,Deliverable,Tasks,WBS`,
+          this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('`+this._projectSelected.ListName+`')/items?$select=Id,Title,Complete,Status,Delay,Deliverable,Task,WBS`,
+          SPHttpClient.configurations.v1);
+      
+        if (!response.ok) {
+          this._sysError = true;
+          const responseText = await response.text();
+          throw new Error(responseText);
+        }
+          const responseJson = await response.json();
+      
+          const groupedArray = GroupByGate(responseJson.value as ITaskListItem[]);
+          return groupedArray;     
+        //console.log(groupedArray);  
+      } catch (error) {
+        console.error("Error fetching gate list items:", error);
+        this._sysError = true;
+        this._environmentMessage = error;
+        this.render();  
+        return [];
+      }
+    }else{
+      console.error("Gate- List not found for: ", this.properties.projectName);
+      this._sysError = true;
+      this.render();  
+      return [];
     }
-  
-    const responseJson = await response.json();
-  
-    const groupedArray = GroupByGate(responseJson.value as ITaskListItem[]);
-    //console.log(groupedArray);
 
-    return groupedArray;
   }
 
   private findTaskByName(

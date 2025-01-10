@@ -10,6 +10,7 @@ import ProgressTasks from "./ProgressTasks";
 import ProgressGates from "./ProgressGates";
 import TaskCard from "./TaskCard";
 import ListTasks from "./ListTasks";
+
 //import type { SwitchProps } from "@fluentui/react-components";
 
 interface IProjectDashboardState {
@@ -57,7 +58,12 @@ export default class ProjectDashboard extends React.Component<
         {this.props.showButtons && (
           <div className={styles.buttons}>
             <Switch
-              label="Show Tasks"
+              label="Show Detail"
+              checked={showDetails}
+              onChange={this.handleSwitchDetailsChange}
+            />
+            <Switch
+              label="List Tasks"
               checked={this._showTasks}
               onChange={(ev) => {
                 this._showTasks = ev.currentTarget.checked;
@@ -65,35 +71,13 @@ export default class ProjectDashboard extends React.Component<
                 this.onGetTaskListItemsChanged();
               }}
             />
-            <Switch
-              label="Show Projects"
-              checked={this._showProjects}
-              onChange={(ev) => {
-                this._showProjects = ev.currentTarget.checked;
-                //this.handleSwitchProjectChange(ev.currentTarget.checked);
-                this.onGetProjectListItemsChanged();
-              }}
-              // onChange={(ev) => {
-              //   this._showProjects = ev.currentTarget.checked;
-              //   //this.handleSwitchProjectChange(ev.currentTarget.checked);
-              //   //this.onGetProjectListItemsChanged();
-              // }}
-            />
-
-            <Switch
-              label="Show Detail"
-              checked={showDetails}
-              onChange={this.handleSwitchDetailsChange}
-            />
-            {/* <p>showProjects: {showProjects ? "true" : "false"}</p>
-            <p>showTasks: {showTasks ? "true" : "false"}</p>
-            <p>ShowDetails: {showDetails ? "true" : "false"}</p> */}
           </div>
         )}
         <div className={styles["columnContainer"]}>
           <div className={styles["rowContainer"]}>
             <button
               type="button"
+              className={styles["iconButton"]}
               onClick={() => {
                 this.onReset();
               }}
@@ -202,10 +186,6 @@ export default class ProjectDashboard extends React.Component<
     //this._taskNameToFind = Message;
     //console.log("ProjectDashboar-onSelectItemsClicked: " + Message);
   }
-
-  private onGetProjectListItemsChanged = (): void => {
-    if (this.props.onGetProjectListItems) this.props.onGetProjectListItems();
-  };
 
   private onGetTaskListItemsChanged = (): void => {
     if (this.props.onGetTaskListItems) this.props.onGetTaskListItems();
