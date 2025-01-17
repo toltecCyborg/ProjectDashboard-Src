@@ -15,7 +15,6 @@ export function FilterTasks(
     Complete: group.Complete,
     Delay: group.Delay,
     Id: group.Id,
-    Status: group.Status,
     Deliverable: group.Deliverable,
     Task: group.Task
   }));

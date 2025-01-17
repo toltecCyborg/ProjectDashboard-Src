@@ -3,7 +3,6 @@ export interface IGateListItem {
     Id: string;
     Title: string;
     Complete: number;
-    Status: string;
     Delay: number;
     Count: number;
   }

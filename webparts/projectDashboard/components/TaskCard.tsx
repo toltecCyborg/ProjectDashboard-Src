@@ -96,12 +96,6 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, showDetails }) => {
               </tr>
               <tr>
                 <td>
-                  <strong>Status:</strong>
-                </td>
-                <td>{task.Status}</td>
-              </tr>
-              <tr>
-                <td>
                   <strong>Gate:</strong>
                 </td>
                 <td>{task.Title}</td>

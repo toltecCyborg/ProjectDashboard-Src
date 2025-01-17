@@ -54,6 +54,7 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
   private _environmentMessage: string = '';
   private _projectSelected: IProjectListItem ;
   private _sysError: boolean = false;
+  private _siteUrl: string = "https://ed2corp.sharepoint.com/sites/ed2team";
 
   //public _selectedFilter: DynamicProperty<string>;
 
@@ -294,9 +295,10 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
    }
 
   private async _getProjectListItems(): Promise<IProjectListItem[]> {
-    //console.log("ProjectName: "+ this.properties.projectName);
+    console.log("ProjectName: "+ this.properties.projectName+" ->"+this._siteUrl + `/_api/web/lists/getbytitle('Projects')/items?$select=Id,Title, ListName, Link `);
     const response = await this.context.spHttpClient.get(
-      this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('Projects')/items?$select=Id,Title, ListName, Link `,
+      //this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('Projects')/items?$select=Id,Title, ListName, Link `,
+      this._siteUrl + `/_api/web/lists/getbytitle('Projects')/items?$select=Id,Title, ListName, Link `,
       SPHttpClient.configurations.v1);
   
     if (!response.ok) {
@@ -343,7 +345,8 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
         try {
           const response = await this.context.spHttpClient.get(
             //this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('PlanCascade')/items?$select=Id,Title,Complete,Status,Delay,Deliverable,Tasks,WBS`,
-            this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('`+this._projectSelected.ListName+`')/items?$select=Id,Title,Complete,Status,Delay,Deliverable,Task,WBS,Description,Responsible,Start,Finish,Barriers, ActualFinish, Effort, ActionableStatus, EvidenceOfCompletion`,
+            //this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('`+this._projectSelected.ListName+`')/items?$select=Id,Title,Complete,Delay,Deliverable,Task,WBS,Description,Responsible,Start,Finish,Barriers, ActualFinish, Effort, ActionableStatus, EvidenceOfCompletion`,
+            this._siteUrl + `/_api/web/lists/getbytitle('`+this._projectSelected.ListName+`')/items?$select=Id,Title,Complete,Delay,Deliverable,Task,WBS,Description,Responsible,Start,Finish,Barriers, ActualFinish, Effort, ActionableStatus, EvidenceOfCompletion`,
             SPHttpClient.configurations.v1);
         
             const responseJson = await response.json();
@@ -383,7 +386,8 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
       try {
         const response = await this.context.spHttpClient.get(
           //this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('PlanCascade')/items?$select=Id,Title,Complete,Status,Delay,Deliverable,Tasks,WBS`,
-          this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('`+this._projectSelected.ListName+`')/items?$select=Id,Title,Complete,Status,Delay,Deliverable,Task,WBS`,
+          //this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('`+this._projectSelected.ListName+`')/items?$select=Id,Title,Complete,Delay,Deliverable,Task,WBS`,
+          this._siteUrl + `/_api/web/lists/getbytitle('`+this._projectSelected.ListName+`')/items?$select=Id,Title,Complete,Delay,Deliverable,Task,WBS`,
           SPHttpClient.configurations.v1);
       
         if (!response.ok) {
@@ -432,7 +436,6 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
       Id: "", 
       Title: "", 
       Complete:0 , 
-      Status: "", 
       Delay:0 , 
       Deliverable: "", 
       Task: "No Task Found..."
