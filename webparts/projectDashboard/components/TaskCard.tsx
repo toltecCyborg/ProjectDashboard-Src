@@ -1,5 +1,7 @@
 import React from "react";
 import { ITaskListItem } from "../../../models";
+import { GetDelay } from "./GetDelay";
+import { GetFormatDate } from "./GetFormatDate";
 import styles from "./ProjectDashboard.module.scss";
 
 interface TaskCardProps {
@@ -29,10 +31,10 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, showDetails }) => {
           </tr>
           <tr
             className={`${styles["task-card"]} ${getCardDelay(
-              task.Delay,
+              GetDelay(task.Finish,task.ActualFinish),
               task.Complete
             )}`}
-          >
+            >
             <td>
               <strong>Completion:</strong>
             </td>
@@ -40,39 +42,32 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, showDetails }) => {
           </tr>
           <tr
             className={`${styles["task-card"]} ${getCardDelay(
-              task.Delay,
+              GetDelay(task.Finish,task.ActualFinish),
               task.Complete
             )}`}
-          >
+            >
             <td>
               <strong>Delay:</strong>
             </td>
-            <td>{task.Delay} days</td>
-          </tr>
-
-          <tr>
-            <td>
-              <strong>Responsible:</strong>
-            </td>
-            <td>{task.Responsible}</td>
+            <td>{GetDelay(task.Finish,task.ActualFinish)} days</td>
           </tr>
           <tr>
             <td>
               <strong>Start:</strong>
             </td>
-            <td>{task.Start}</td>
+            <td>{GetFormatDate(task.Start)}</td>
           </tr>
           <tr>
             <td>
               <strong>Finish:</strong>
             </td>
-            <td>{task.Finish}</td>
+            <td>{GetFormatDate(task.Finish)}</td>
           </tr>
           <tr>
             <td>
               <strong>ActualFinish:</strong>
             </td>
-            <td>{task.ActualFinish}</td>
+            <td>{GetFormatDate(task.ActualFinish)}</td>
           </tr>
           <tr>
             <td>
@@ -80,7 +75,8 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, showDetails }) => {
             </td>
             <td>{task.Effort}</td>
           </tr>
-          {showDetails && (
+
+          {showDetails && (            
             <>
               <tr>
                 <td>
@@ -108,13 +104,34 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, showDetails }) => {
               </tr>
             </>
           )}
-          {false && (
+          {true && (
+            <>
+            <tr>
+              <td>
+                <strong>Responsible:</strong>
+              </td>
+              <td>
+                <a
+                  href={task.Responsible?.Url}
+                  target="_blank"
+                >{task.Responsible?.Description}
+                </a>
+              </td>
+            </tr>
             <tr>
               <td>
                 <strong>EvidenceOfCompletion:</strong>
               </td>
-              <td>{task.EvidenceOfCompletion}</td>
+              <td>        
+                <a
+                  href={task.EvidenceOfCompletion?.Url}
+                  target="_blank"
+                >{task.EvidenceOfCompletion?.Description}
+                </a>
+              </td>
             </tr>
+            
+            </>
           )}
         </tbody>
       </table>

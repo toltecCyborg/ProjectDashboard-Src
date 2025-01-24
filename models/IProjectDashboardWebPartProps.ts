@@ -6,7 +6,7 @@ export interface IProjectDashboardWebPartProps {
     projectName: string;
     isDashboard: boolean;
     showButtons: boolean;
-    showStack: boolean;
+    showLog: boolean;
     
     selectedTask: ITaskListItem;
     filterValue: string;

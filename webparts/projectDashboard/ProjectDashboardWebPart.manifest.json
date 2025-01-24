@@ -24,13 +24,10 @@
     "properties": {
       "description": "Project: ",
       "refreshInterval": "5000",
-      "showCards": false,
       "projectName": "RF Cascade",
       "isDashboard": true,
-      "showButtons": false,
-      "showProjects": false,
-      "showTasks": false,
-      "filterValue": ""
+      "showButtons": true,
+      "showLog": false
     }
   }]
 }

@@ -13,7 +13,6 @@ export function FilterTasks(
   return Object.values(filteredArray).map((group) => ({
     Title: group.Title,
     Complete: group.Complete,
-    Delay: group.Delay,
     Id: group.Id,
     Deliverable: group.Deliverable,
     Task: group.Task

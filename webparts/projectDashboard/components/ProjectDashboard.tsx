@@ -5,11 +5,11 @@ import { escape } from "@microsoft/sp-lodash-subset";
 import ListProject from "./ListProject";
 //import { useState } from "react";
 import { Switch } from "@fluentui/react-components";
-import StackGates from "./StackGates";
 import ProgressTasks from "./ProgressTasks";
 import ProgressGates from "./ProgressGates";
 import TaskCard from "./TaskCard";
 import ListTasks from "./ListTasks";
+import { MessageLog } from "./MessageLog";
 
 //import type { SwitchProps } from "@fluentui/react-components";
 
@@ -24,8 +24,9 @@ export default class ProjectDashboard extends React.Component<
   IProjectDashboardState
 > {
   private _showProjects: boolean = false;
-  private _showTasks: boolean = false;
+  private _showTasks: boolean = true;
   //private _showDetails: boolean = false;
+
   constructor(props) {
     super(props);
     this.state = {
@@ -94,29 +95,17 @@ export default class ProjectDashboard extends React.Component<
                 <strong>{escape(this.props.projectName)}</strong>{" "}
               </h2>
             </div>
-            
           </div>
           <div>
-            {!this.props.showStack && spGateListItems && (
+            {spGateListItems && (
               <ProgressGates
                 gates={spGateListItems}
-                tasks={spTaskListItems}
                 onSelectItem={(item, group) => {
                   this.props.onSelectItem(item, group);
                   //this._showDetails = true;
                 }}
                 showDetails={showDetails}
               />
-            )}
-            {this.props.showStack && spGateListItems && (
-              <>
-                <StackGates
-                  gates={spGateListItems}
-                  onSelectItem={(item, group) => {
-                    this.props.onSelectItem(item, group);
-                  }}
-                />
-              </>
             )}
             {spTaskListItems.length > 0 && (
               <ProgressTasks
@@ -132,11 +121,13 @@ export default class ProjectDashboard extends React.Component<
 
         {this.props.selectedTask &&
           this.props.selectedTask.Title.length > 0 && (
-            <>
+            <>{ (
               <TaskCard
                 task={this.props.selectedTask}
                 showDetails={showDetails}
               />
+            )            
+            }
             </>
           )}
         {this._showTasks && spTaskListItems.length > 0 && (
@@ -145,9 +136,10 @@ export default class ProjectDashboard extends React.Component<
               items={spTaskListItems}
               heading={
                 spTaskListItems.length > 0
-                  ? "Tasks: " + spTaskListItems[0].Title
+                  ? "Pending Tasks: " + spTaskListItems[0].Title
                   : ""
               }
+              showDetails={showDetails}
               onSelectItem={(item, group) => {
                 this.props.onSelectItem(item, group);
               }}
@@ -173,6 +165,13 @@ export default class ProjectDashboard extends React.Component<
             />
           </>
         )}
+        {this.props.showLog && this.props.environmentMessage.length > 0 && (
+          <>
+            <p>
+              <strong>System Log: </strong> {this.props.environmentMessage}
+            </p>
+          </>
+        )}
       </section>
     );
   }
@@ -181,10 +180,7 @@ export default class ProjectDashboard extends React.Component<
     //showDetails = false;
     if (this.props.onGetGateListItems) this.props.onGetGateListItems();
 
-    console.log("ProjectDashboar-onReset...");
-
-    //this._taskNameToFind = Message;
-    //console.log("ProjectDashboar-onSelectItemsClicked: " + Message);
+    MessageLog("ProjectDashboar/onReset...");
   }
 
   private onGetTaskListItemsChanged = (): void => {

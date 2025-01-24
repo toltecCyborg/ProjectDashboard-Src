@@ -1,6 +1,7 @@
 import * as React from "react";
 import { ITaskListItem } from "../../../models";
 import styles from "./ProjectDashboard.module.scss";
+import { GetDelay } from "./GetDelay";
 
 interface GateCardProps {
   tasks: ITaskListItem[];
@@ -11,7 +12,7 @@ const ProgressTasks = ({ onSelectItem, showDetails, tasks }: GateCardProps) => {
   //let _showDetails: boolean = false;
   //Hook
   //const tasks: ITaskListItem[] = [];
- 
+
   const getCardClass = (delay: number, complete: number) => {
     if (complete === 1) return styles.green;
     if (delay > 0 && delay <= 7) return styles.yellow;
@@ -33,28 +34,20 @@ const ProgressTasks = ({ onSelectItem, showDetails, tasks }: GateCardProps) => {
             <div
               key={item.Id}
               className={`${styles["ed2Card"]} ${getCardClass(
-                item.Delay,
+                GetDelay(item.Finish, item.ActualFinish),
                 item.Complete
               )}`}
             >
               <div
                 className={`${styles["cardContent"]} ${getCardDelay(
-                  item.Delay,
+                  GetDelay(item.Finish, item.ActualFinish),
                   item.Complete
                 )}`}
                 onClick={() => {
                   onSelectItem(item.Task, "task");
                 }}
-              >                
-                <p>
-                  <strong>{Math.floor(item.Complete * 100)}% </strong>
-                </p>
-                {item.Delay > 0 && (
-                  <p>
-                    <strong>(- {item.Delay} days) </strong>
-                  </p>
-                )}
-                <p>{item.Task}</p>
+              >
+                <p>{item.WBS}</p>
               </div>
             </div>
           ))}
@@ -65,7 +58,7 @@ const ProgressTasks = ({ onSelectItem, showDetails, tasks }: GateCardProps) => {
             <div
               key={item.Id}
               className={`${styles["progressCard"]} ${getCardClass(
-                item.Delay,
+                GetDelay(item.Finish, item.ActualFinish),
                 item.Complete
               )}`}
               onClick={() => {

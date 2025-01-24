@@ -17,11 +17,8 @@ export interface IProjectDashboardProps {
   description: string;
   projectName: string;
   
-  showStack: boolean;
+  showLog: boolean;
   showButtons: boolean;
-  //showProjects?: boolean;
-  //showTasks?: boolean;
-  //showDetails?: boolean;
     
   refreshInterval: number;
   filterValue: string;
