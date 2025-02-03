@@ -12,9 +12,9 @@ const ProgressGates = ({ gates, onSelectItem, showDetails }: GateCardProps) => {
   const getBackgroundImage = (delay: number, complete: number) => {
     if (complete === 1) {
       return require("../assets/ArrowGreen.png");
-    } else if (delay >= 14) {
-      return require("../assets/ArrowRed.png");
     } else if (delay >= 7) {
+      return require("../assets/ArrowRed.png");
+    } else if (delay > 0) {
       return require("../assets/ArrowYellow.png");
     } else {
       return require("../assets/ArrowWhite.png");

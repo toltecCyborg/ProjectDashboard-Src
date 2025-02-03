@@ -38,7 +38,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, showDetails }) => {
             <td>
               <strong>Completion:</strong>
             </td>
-            <td>{task.Complete * 100}%</td>
+            <td>{(Math.floor(task.Complete * 100))}%</td>
           </tr>
           <tr
             className={`${styles["task-card"]} ${getCardDelay(

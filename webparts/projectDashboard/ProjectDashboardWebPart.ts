@@ -360,7 +360,7 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
         const response = await this.context.spHttpClient.get(
           //this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('PlanCascade')/items?$select=Id,Title,Complete,Status,Delay,Deliverable,Tasks,WBS`,
           //this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('`+this._projectSelected.ListName+`')/items?$select=Id,Title,Complete,Delay,Deliverable,Task,WBS,Description,Responsible,Start,Finish,Barriers, ActualFinish, Effort, ActionableStatus, EvidenceOfCompletion`,
-          this._siteUrl + `/_api/web/lists/getbytitle('`+this._projectSelected.ListName+`')/items?$select=Id,Title,Complete,Delay,Deliverable,Task,WBS,Description,Responsible,Start,Finish,Barriers, ActualFinish, Effort, ActionableStatus, EvidenceOfCompletion`,
+          this._siteUrl + `/_api/web/lists/getbytitle('`+this._projectSelected.ListName+`')/items?$select=Id,Title,Complete,Deliverable,Task,WBS,Description,Responsible,Start,Finish,Barriers, ActualFinish, Effort, ActionableStatus, EvidenceOfCompletion`,
           SPHttpClient.configurations.v1);
       
           const responseJson = await response.json();
@@ -405,7 +405,7 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
         const response = await this.context.spHttpClient.get(
           //this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('PlanCascade')/items?$select=Id,Title,Complete,Status,Delay,Deliverable,Tasks,WBS`,
           //this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('`+this._projectSelected.ListName+`')/items?$select=Id,Title,Complete,Delay,Deliverable,Task,WBS`,
-          this._siteUrl + `/_api/web/lists/getbytitle('`+this._projectSelected.ListName+`')/items?$select=Id,Title,Complete,Delay,Deliverable,Task,WBS`,
+          this._siteUrl + `/_api/web/lists/getbytitle('`+this._projectSelected.ListName+`')/items?$select=Id,Title,Complete, Start, Finish, ActualFinish, Effort`,
           SPHttpClient.configurations.v1);
       
         if (!response.ok) {

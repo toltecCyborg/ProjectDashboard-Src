@@ -1,23 +1,17 @@
 import React from "react";
-import { Pie } from "react-chartjs-2";
+import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, Title } from "chart.js";
 import { IGateListItem } from "../../../models";
 import ChartDataLabels from "chartjs-plugin-datalabels";
+import { GroupByProject } from "./GroupByProject";
 
 ChartJS.register(ArcElement, Tooltip, Legend, Title, ChartDataLabels);
 
-interface PieProps {
+interface ChartProps {
   gates: IGateListItem[];
 }
 
-const PieChart: React.FC<PieProps> = ({ gates }) => {
-  // Datos para el gráfico
-  // const getDelay = (delay: number, complete: number) => {
-  //   //console.log("Styles:" + delay + "-" + complete);
-  //   if (complete === 1) return "";
-  //   if (delay > 0) return delay.toString;
-  //   return ""; // Default Class
-  // };
+const DoughnutChart: React.FC<ChartProps> = ({ gates }) => {
   const getCardColor = (delay: number, complete: number) => {
     //console.log("Styles:" + delay + "-" + complete);
     if (complete === 1) return "#4CAF50";
@@ -33,7 +27,6 @@ const PieChart: React.FC<PieProps> = ({ gates }) => {
     return "#CCCCFF80"; // Default Class
   };
   const data = {
-    //labels: ["Rojo", "Azul", "Amarillo", "Verde", "Púrpura"],
     labels: gates.map((gate, index) => gate.Title.substring(0, 1)),
     datasets: [
       {
@@ -50,46 +43,37 @@ const PieChart: React.FC<PieProps> = ({ gates }) => {
     ],
   };
 
-  // const links = [
-  //   "https://ed2corp.sharepoint.com/:li:/s/ED2Team/E80yc1ycjJJOqZv99gCYfVMBMM0JE1Gvmfo7wwwnQH9xUA?e=gOV6BU",
-  //   "https://ed2corp.sharepoint.com/:li:/s/ED2Team/EycoaOw1kBFOqR2HsQZi8-oBHraIJzqD1aw6Ajttl-DALQ?e=oL8qAA",
-  //   "https://ed2corp.sharepoint.com/:li:/s/ED2Team/E0dNXCD_b8RDtVu-1iIccSUBg_NANTyWM1D67eX-Lx8Xfg?e=quHqt6",
-  //   "https://ed2corp.sharepoint.com/:li:/s/ED2Team/E1g56bPuMfJEjPOOyncqj-QBaQUCT4Qy8pNfUc5ODbCQXg?e=TZekzB",
-  //   "https://ed2corp.sharepoint.com/:li:/s/ED2Team/E4GkxjRpQGVCjEh05S4rS_kB5Y7iVAUiWr9VINpNSjJ1zw?e=FKXSai",
-  // ];
+  const centerTextPlugin = {
+    id: "centerText",
+    beforeDraw: (chart) => {
+      const { width, height, ctx } = chart;
+      ctx.restore();
 
-  // const onClick = (event, elements) => {
-  //   if (elements.length > 0) {
-  //     const index = elements[0].index;
-  //     window.open(links[index], "_blank");
-  //   }
-  // };
+      const fontSize = (height / 80).toFixed(2);
+      ctx.font = `${fontSize}em sans-serif`;
+      ctx.textBaseline = "middle";
 
-  // Opciones de configuración del gráfico
-  // const options = {
-  //   responsive: true,
-  //   plugins: {
-  //     legend: {
-  //       position: "right" as const, // Coloca la leyenda en la parte superior
-  //     },
-  //     title: {
-  //       display: true,
-  //       text: "RF Cascade", // Título del gráfico
-  //     },
-  //   },
-  // };
+      const text = GroupByProject(gates).Complete + "%";
+      const textX = Math.round((width - ctx.measureText(text).width) / 2);
+      const textY = height / 2;
+
+      ctx.fillStyle = "#333"; // Color del texto
+      ctx.fillText(text, textX, textY);
+      ctx.save();
+    },
+  };
 
   return (
-    <div style={{ width: "150px", margin: "0", alignContent: "start" }}>
-      <Pie
+    <div style={{ width: "120px", margin: "0", alignContent: "start" }}>
+      <Doughnut
         data={data}
         options={{
+          cutout: "70%",
           responsive: true,
           plugins: {
             legend: {
               display: false, // Oculta la leyenda externa
             },
-
             datalabels: {
               color: "darkblue", // Color del texto dentro del pie
               font: {
@@ -98,10 +82,7 @@ const PieChart: React.FC<PieProps> = ({ gates }) => {
               },
               formatter: (value, ctx) => {
                 const index = ctx.dataIndex;
-                return `${data.labels[index]}`; // Muestra nombre y porcentaje dentro de cada rebanada
-                // return `${data.labels[index]}\n(${Math.floor(
-                //   gates[index].Complete * 100
-                // )}%)`; // Muestra nombre y porcentaje dentro de cada rebanada
+                return `${data.labels[index]}`;
               },
               anchor: "center",
               align: "center",
@@ -113,7 +94,7 @@ const PieChart: React.FC<PieProps> = ({ gates }) => {
                   const value = Math.floor(gates[index].Complete * 100);
 
                   // Personaliza el mensaje del tooltip
-                  return `${value}% | Delay: ${Math.floor(gates[index].Delay)}`;
+                  return `${value}%|Del: ${Math.floor(gates[index].Delay)}`;
                 },
                 title: function () {
                   return "📌 Status:";
@@ -121,15 +102,11 @@ const PieChart: React.FC<PieProps> = ({ gates }) => {
               },
             },
           },
-          // onClick: onClick,
         }}
+        plugins={[centerTextPlugin]}
       />
     </div>
-
-    // <div style={{ width: "300px", margin: "0 auto" }}>
-    //   <Pie data={data} options={options} />
-    // </div>
   );
 };
 
-export default PieChart;
+export default DoughnutChart;
