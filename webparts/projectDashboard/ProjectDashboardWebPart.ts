@@ -268,7 +268,7 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
         item
       );  
       MessageLog("Received: Value: " + item + " Group: " + group+ " Total: "+ response.length + " Filtered: " + this._selectedTask.Task,"_onSelectedItem",this.MsgInfo,this.properties.showLog);
-    }else {
+    }else {      
       this._filteredTasks = FilterTasks(response, group, item);
       MessageLog("Received: Value: " + item + " Group: " + group+ " Total: "+ response.length + " Filtered: " + this._filteredTasks.length,"_onSelectedItem",this.MsgInfo,this.properties.showLog);
     }
