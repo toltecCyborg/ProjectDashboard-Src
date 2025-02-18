@@ -23,7 +23,7 @@ const ListProject = ({ items, heading, onSelectItem }: ListProjectProps) => {
           <tr>
             <th>Project</th>
             <th>List Name</th>
-            <th>Status</th>
+            <th>Planner</th>
           </tr>
         </thead>
         <tbody>
@@ -33,12 +33,12 @@ const ListProject = ({ items, heading, onSelectItem }: ListProjectProps) => {
               className={selectedIndex === index ? "table-active" : ""}
               onClick={() => {
                 setSelectedIndex(index);
-                onSelectItem(item.Title,"project");
+                onSelectItem(item.Title, "project");
               }}
             >
               <td>{item.Title}</td>
               <td>{item.ListName}</td>
-              <td>{item.Status}</td>
+              <td>{item.isPlanner}</td>
             </tr>
           ))}
         </tbody>

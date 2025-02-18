@@ -61,7 +61,6 @@ export default class ProjectDashboard extends React.Component<
               target="_blank"
             >
               <h3> {project.Title} </h3>
-              {console.log("project.link: " + project.Link.Url)}
             </a>
             {spGateListItems && (
               <a
