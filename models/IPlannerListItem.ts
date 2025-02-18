@@ -1,6 +1,7 @@
 export interface IPlannerListItem {
   id: string;
   title: string;
+  orderHint: string;
   startDateTime?: string;
   dueDateTime?: string;
   completedDateTime?: string;

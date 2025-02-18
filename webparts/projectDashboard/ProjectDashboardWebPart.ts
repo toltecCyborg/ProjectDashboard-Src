@@ -56,13 +56,12 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
   
   protected async onInit(): Promise<void> {
     this.context.dynamicDataSourceManager.initializeSource(this);
-    await this._onGetGateListItems(); 
-    await this._onGetTaskListItems();
-    if(this.MsgInfo === 0) await this._onGetPlannerListItems();
-    //await this._onGetProjectListItems();     
+    this._projects = await this._getProjectListItems();
+
+    await this._onReset();
+       
     //return super.onInit();
     await super.onInit();
-
     
   }
 
@@ -77,7 +76,7 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
       ProjectDashboard,
       {
         spGateListItems: this._gates,
-        onGetGateListItems: this._onGetGateListItems,
+        onGetGateListItems: this._onReset,
         spTaskListItems: this._tasks,
         spFilteredTaskItems: this._filteredTasks,
         onGetTaskListItems: this._onGetTaskListItems,
@@ -116,23 +115,7 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
       ReactDom.render(errorPage, this.domElement);
     }
     else {
-        ReactDom.render(progressBar, this.domElement);  
-
-      //   this.domElement.innerHTML = `
-      //   <div>
-      //     <h1>Plan: ${this._plan[0]?.title || "No plan found"}</h1>
-      //     <ul>
-      //       ${this._plan.map(task => `
-      //         <li>
-      //           <strong>${task.title}</strong>
-      //           <p>Start: ${task.startDateTime || "N/A"}</p>
-      //           <p>Due: ${task.dueDateTime || "N/A"}</p>
-      //           <p>Progress: ${task.percentComplete || 0}%</p>
-      //         </li>
-      //       `).join("")}
-      //     </ul>
-      //   </div>
-      // `;
+        ReactDom.render(progressBar, this.domElement);     
   
       }
 
@@ -228,6 +211,27 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
 
 
   /** */
+
+  private async _onReset(){
+    this._sysError = false;
+
+    this._projectSelected = this._getProjectInfo(this.properties.projectName);
+
+    if(this._projectSelected.isPlanner){
+      await this._onGetPlannerListItems();
+    }else{
+      await this._onGetTaskListItems();
+    }
+//    console.log("[_onGetGateListItems] isPlanner: "+this._projectSelected.ListName+"-"+this._projectSelected.isPlanner);
+
+    await this._onGetGateListItems(); 
+
+    this._filteredTasks = FilterTasks(this._tasks, "gate", "actual");
+    this._selectedTask = this.newTask();
+
+    //await this._onGetProjectListItems();  
+  }
+
   private _onGetPlannerListItems = async (): Promise<void> => {
 
       // Obtener el cliente de Microsoft Graph (versión V3)
@@ -277,7 +281,7 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
     MessageLog(`Handling project change: ${projectName}`,"_onProjectChange",this.MsgInfo,this.properties.showLog);
 
     // Ejemplo: Recargar datos específicos según el proyecto
-    await this._onGetGateListItems();
+    await this._onReset();
   }
 
   private _getProjectInfo (planName: string): IProjectListItem { 
@@ -327,17 +331,19 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
 
   private _onSelectedItem = async (item: string, group: string): Promise<void> => {
     
-    const response: ITaskListItem[] = await this._getTaskListItems();   
+    if(this._tasks.length===0){
+      this._tasks = await this._getTaskListItems();   
+    }
 
     if(group === "task"){
       this._selectedTask = this.findTaskByName(
-        response,
+        this._tasks,
         item
       );  
-      MessageLog("Received: Value: " + item + " Group: " + group+ " Total: "+ response.length + " Filtered: " + this._selectedTask.Task,"_onSelectedItem",this.MsgInfo,this.properties.showLog);
+      MessageLog("Received: Value: " + item + " Group: " + group+ " Total: "+ this._tasks.length + " Filtered: " + this._selectedTask.Task,"_onSelectedItem",this.MsgInfo,this.properties.showLog);
     }else {      
-      this._filteredTasks = FilterTasks(response, group, item);
-      MessageLog("Received: Value: " + item + " Group: " + group+ " Total: "+ response.length + " Filtered: " + this._filteredTasks.length,"_onSelectedItem",this.MsgInfo,this.properties.showLog);
+      this._filteredTasks = FilterTasks(this._tasks, group, item);
+      MessageLog("Received: Value: " + item + " Group: " + group+ " Total: "+ this._tasks.length + " Filtered: " + this._filteredTasks.length,"_onSelectedItem",this.MsgInfo,this.properties.showLog);
     }
     //if(this.properties.showLog) console.log("Received: Value: " + item + " Group: " + group+ " Total: "+ response.length + " Filtered: " + this._tasks.length );
     this.render();
@@ -366,9 +372,14 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
           SPHttpClient.configurations.v1);
       
           const responseJson = await response.json();
+          const tasks : ITaskListItem[] = responseJson.value as ITaskListItem[];
           //console.log("Project: " + project + " Grouper: "+grouper+" Filter: "+filter);
-      
-          return responseJson.value as ITaskListItem[];
+          this._tasks = this._tasks.map(task => ({
+            ...task,
+            Complete: Math.trunc(task.Complete * 100)
+          }));
+          
+          return tasks;
             //console.log(groupedArray);  
       } catch (error) {
         if(this.properties.showLog) console.error("[_getTaskListItems] Error fetching gate list items:", error);
@@ -389,13 +400,7 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
   }
 
   private _onGetGateListItems = async (): Promise<void> => {
-    this._sysError = false;
-    this._projects = await this._getProjectListItems();
-    this._projectSelected = this._getProjectInfo(this.properties.projectName);
-    console.log("[_onGetGateListItems] isPlanner: "+this._projectSelected.ListName+"-"+this._projectSelected.isPlanner);
     this._gates = await this._getGateListItems();
-    this._filteredTasks = FilterTasks(this._tasks, "gate", "actual");
-    this._selectedTask = this.newTask();
     this.render();
   }
 
@@ -404,21 +409,16 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
     //this._projectSelected = this._getProjectInfo(this.properties.projectName);
     if(this._projectSelected.ListName.length > 0){
       try {
-        const response = await this.context.spHttpClient.get(
-          //this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('PlanCascade')/items?$select=Id,Title,Complete,Status,Delay,Deliverable,Tasks,WBS`,
-          //this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('`+this._projectSelected.ListName+`')/items?$select=Id,Title,Complete,Delay,Deliverable,Task,WBS`,
-          this._siteUrl + `/_api/web/lists/getbytitle('`+this._projectSelected.ListName+`')/items?$select=Id,Title,Complete, Start, Finish, ActualFinish, Effort`,
-          SPHttpClient.configurations.v1);
-      
-        if (!response.ok) {
-          this._sysError = true;
-          const responseText = await response.text();
-          throw new Error(responseText);
+        if(this._tasks.length === 0){
+          const response: ITaskListItem[] = await this._getTaskListItems();
+          this._tasks = response;
+        }else{
+          if(this._tasks.length > 0){
+            return GroupByGate(this._tasks);     
+          }
         }
-          const responseJson = await response.json();
-      
-          const groupedArray = GroupByGate(responseJson.value as ITaskListItem[]);
-          return groupedArray;     
+        MessageLog("Gate- List not found for: "+ this.properties.projectName,"_getGateListItems",this.MsgError,this.properties.showLog);
+        return []; //Error State      
         //console.log(groupedArray);  
       } catch (error) {
         if(this.properties.showLog) console.error("Error fetching gate list items:", error);

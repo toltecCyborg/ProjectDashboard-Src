@@ -58,10 +58,14 @@ const ProgressGates = ({ gates, onSelectItem, showDetails }: GateCardProps) => {
                 }}
               >
                 <h5>
-                  <strong>{gate.Title} </strong>
+                  <strong>
+                    {gate.Title.length > 7
+                      ? gate.Title.substring(0, 7)
+                      : gate.Title}{" "}
+                  </strong>
                 </h5>
                 <p>
-                  <strong>{Math.floor(gate.Complete * 100)}% </strong>
+                  <strong>{Math.floor(gate.Complete)}% </strong>
                 </p>
                 {gate.Delay > 0 && (
                   <p>
@@ -105,10 +109,14 @@ const ProgressGates = ({ gates, onSelectItem, showDetails }: GateCardProps) => {
                 }}
               >
                 <h5>
-                  <strong>{gate.Title} </strong>
+                  <strong>
+                    {gate.Title.length > 7
+                      ? gate.Title.substring(0, 7)
+                      : gate.Title}{" "}
+                  </strong>
                 </h5>
                 <p>
-                  <strong>{Math.floor(gate.Complete * 100)}% </strong>
+                  <strong>{Math.floor(gate.Complete)}% </strong>
                 </p>
                 {gate.Delay > 0 && (
                   <p>

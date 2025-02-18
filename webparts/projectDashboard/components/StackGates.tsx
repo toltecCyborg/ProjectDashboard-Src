@@ -54,13 +54,13 @@ const StackGates = ({ gates, onSelectItem }: GateCardProps) => {
                 {gate.Delay > 0 && (
                   <p>
                     <strong>
-                      {Math.floor(gate.Complete * 100)} % (- {gate.Delay} days){" "}
+                      {Math.floor(gate.Complete )} % (- {gate.Delay} days){" "}
                     </strong>
                   </p>
                 )}
                 {gate.Delay === 0 && (
                   <p>
-                    <strong>{Math.floor(gate.Complete * 100)} % </strong>
+                    <strong>{Math.floor(gate.Complete )} % </strong>
                   </p>
                 )}
               </div>
