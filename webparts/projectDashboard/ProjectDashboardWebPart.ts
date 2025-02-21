@@ -54,15 +54,23 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
   private MsgInfo = 0;
   private MsgError = 2;
   
-  protected async onInit(): Promise<void> {
+  protected async onInit(): Promise<void> { 
+    this._sysError = false;
+
     this.context.dynamicDataSourceManager.initializeSource(this);
     this._projects = await this._getProjectListItems();
+    this._projectSelected = this._getProjectInfo(this.properties.projectName);
 
-    await this._onReset();
-       
-    //return super.onInit();
-    await super.onInit();
+    if(this._projectSelected.isPlanner){
+      await this._onGetPlannerListItems();
+    }else{
+      await this._onGetTaskListItems();
+    }
     
+    await this._onReset(); 
+     
+    //return super.onInit();
+    await super.onInit();    
   }
 
 
@@ -211,25 +219,16 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
 
 
   /** */
-
-  private async _onReset(){
+  private _onReset = async (): Promise<void> => {
     this._sysError = false;
-
-    this._projectSelected = this._getProjectInfo(this.properties.projectName);
-
-    if(this._projectSelected.isPlanner){
-      await this._onGetPlannerListItems();
-    }else{
-      await this._onGetTaskListItems();
-    }
-//    console.log("[_onGetGateListItems] isPlanner: "+this._projectSelected.ListName+"-"+this._projectSelected.isPlanner);
 
     await this._onGetGateListItems(); 
 
     this._filteredTasks = FilterTasks(this._tasks, "gate", "actual");
     this._selectedTask = this.newTask();
 
-    //await this._onGetProjectListItems();  
+    this.render();
+
   }
 
   private _onGetPlannerListItems = async (): Promise<void> => {
@@ -279,6 +278,14 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
     // Aquí puedes agregar la lógica personalizada que necesites ejecutar.
     //if(this.properties.showLog) console.log(`Handling project change: ${projectName}`);
     MessageLog(`Handling project change: ${projectName}`,"_onProjectChange",this.MsgInfo,this.properties.showLog);
+
+    this._projectSelected = this._getProjectInfo(this.properties.projectName);
+
+    if(this._projectSelected.isPlanner){
+      await this._onGetPlannerListItems();
+    }else{
+      await this._onGetTaskListItems();
+    }
 
     // Ejemplo: Recargar datos específicos según el proyecto
     await this._onReset();
