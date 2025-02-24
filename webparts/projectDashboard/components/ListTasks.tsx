@@ -26,8 +26,7 @@ const ListTasks = ({
         ? items.length
         : items.filter(
             (item) =>
-              Math.floor(item.Complete ) < 100 &&
-              Math.floor(item.Complete ) > 0
+              Math.floor(item.Complete) < 100 && Math.floor(item.Complete) > 0
           ).length) > 0 && (
         <div>
           <h1>{heading}</h1>
@@ -47,7 +46,7 @@ const ListTasks = ({
                 ? items
                 : items.filter(
                     (item) =>
-                      Math.floor(item.Complete ) < 100 &&
+                      Math.floor(item.Complete) < 100 &&
                       GetDelay(item.Finish, item.ActualFinish) > 0
                   )
               ).map((item, index) => (
@@ -60,7 +59,7 @@ const ListTasks = ({
                   }}
                 >
                   <td>{item.Task}</td>
-                  <td>{Math.floor(item.Complete )}% </td>
+                  <td>{Math.floor(item.Complete)}% </td>
                   <td>{GetDelay(item.Finish, item.ActualFinish)}</td>
                   <td>{GetFormatDate(item.Finish)}</td>
                   <td>{GetFormatDate(item.ActualFinish)}</td>

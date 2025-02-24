@@ -39,10 +39,12 @@ export function GroupByGate(data: ITaskListItem[]): IGateListItem[] {
     if (finishDate && finishDate.getTime() > acc[Title].Finish.getTime()) {
       acc[Title].Finish = finishDate;
     }
-    if (actualFinishDate && actualFinishDate.getTime() > acc[Title].ActualFinish.getTime()) {
+    if (
+      actualFinishDate &&
+      actualFinishDate.getTime() > acc[Title].ActualFinish.getTime()
+    ) {
       acc[Title].ActualFinish = actualFinishDate;
     }
-
 
     //acc[item.title].push(item);
     return acc;

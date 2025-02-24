@@ -12,16 +12,20 @@ interface ChartProps {
 }
 
 const DoughnutChart: React.FC<ChartProps> = ({ gates }) => {
+
+  const project: IGateListItem = GroupByProject(gates);
+  console.log("[DoughnutChart] gates: " + gates.length + "-" + project.Complete);
+
   const getCardColor = (delay: number, complete: number) => {
     //console.log("Styles:" + delay + "-" + complete);
-    if (complete === 1) return "#4CAF50";
+    if (complete === 100) return "#4CAF50";
     if (delay > 0 && delay <= 7) return "#FFCE56";
     if (delay > 7) return "#FF3B4E";
     return "#FFFFFF "; // Default Class
   };
   const getCardBackground = (delay: number, complete: number) => {
     //console.log("BackStyles:" + delay + "-" + complete);
-    if (complete === 1) return "#4CAF50CC"; //green
+    if (complete === 100) return "#4CAF50CC"; //green
     if (delay > 0 && delay <= 7) return "#FFCE56CC"; //yellow
     if (delay > 7) return "#FF6384CC"; //red
     return "#CCCCFF80"; // Default Class
@@ -43,6 +47,7 @@ const DoughnutChart: React.FC<ChartProps> = ({ gates }) => {
     ],
   };
 
+
   const centerTextPlugin = {
     id: "centerText",
     beforeDraw: (chart) => {
@@ -52,8 +57,7 @@ const DoughnutChart: React.FC<ChartProps> = ({ gates }) => {
       const fontSize = (height / 80).toFixed(2);
       ctx.font = `${fontSize}em sans-serif`;
       ctx.textBaseline = "middle";
-
-      const text = GroupByProject(gates).Complete + "%";
+      const text = project.Complete + "%";
       const textX = Math.round((width - ctx.measureText(text).width) / 2);
       const textY = height / 2;
 
@@ -91,7 +95,7 @@ const DoughnutChart: React.FC<ChartProps> = ({ gates }) => {
               callbacks: {
                 label: function (tooltipItem) {
                   const index = tooltipItem.dataIndex;
-                  const value = Math.floor(gates[index].Complete * 100);
+                  const value = Math.floor(gates[index].Complete);
 
                   // Personaliza el mensaje del tooltip
                   return `${value}%|Del: ${Math.floor(gates[index].Delay)}`;

@@ -14,13 +14,13 @@ const ProgressTasks = ({ onSelectItem, showDetails, tasks }: GateCardProps) => {
   //const tasks: ITaskListItem[] = [];
 
   const getCardClass = (delay: number, complete: number) => {
-    if (complete === 1) return styles.green;
+    if (complete === 100) return styles.green;
     if (delay > 0 && delay <= 7) return styles.yellow;
     if (delay > 7) return styles.red;
     return styles.white; // Default Class
   };
   const getCardDelay = (delay: number, complete: number) => {
-    if (complete === 1) return styles.whiteFont;
+    if (complete === 100) return styles.whiteFont;
     if (delay === 0) return styles.greenFont;
     if (delay > 0 && delay <= 7) return styles.redFont;
     if (delay > 7) return styles.whiteFont;

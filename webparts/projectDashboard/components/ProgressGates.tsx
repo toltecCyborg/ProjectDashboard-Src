@@ -10,7 +10,7 @@ interface GateCardProps {
 }
 const ProgressGates = ({ gates, onSelectItem, showDetails }: GateCardProps) => {
   const getBackgroundImage = (delay: number, complete: number) => {
-    if (complete === 1) {
+    if (complete === 100) {
       return require("../assets/ArrowGreen.png");
     } else if (delay >= 7) {
       return require("../assets/ArrowRed.png");
@@ -22,7 +22,7 @@ const ProgressGates = ({ gates, onSelectItem, showDetails }: GateCardProps) => {
   };
 
   const getCardDelay = (delay: number, complete: number) => {
-    if (complete === 1) return styles.whiteFont;
+    if (complete === 100) return styles.whiteFont;
     if (delay === 0) return styles.greenFont;
     if (delay > 0 && delay <= 7) return styles.redFont;
     if (delay > 7) return styles.whiteFont;

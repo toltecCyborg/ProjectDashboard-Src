@@ -252,7 +252,7 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
       console.error("Error loading plan details:", error);
     }
 
-    this.render();
+    //this.render();
    }
 
   // Método para obtener el ID del grupo
@@ -316,7 +316,7 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
     const response: IProjectListItem[] = await this._getProjectListItems();
     this._projects = response;    
   
-    this.render();
+    //this.render();
    }
 
   private async _getProjectListItems(): Promise<IProjectListItem[]> {
@@ -361,7 +361,7 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
     const response: ITaskListItem[] = await this._getTaskListItems();
     this._tasks = response;
     
-    this.render();
+    //this.render();
    }
 
   private async _getTaskListItems(): Promise<ITaskListItem[]> {
@@ -381,11 +381,11 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
           const responseJson = await response.json();
           const tasks : ITaskListItem[] = responseJson.value as ITaskListItem[];
           //console.log("Project: " + project + " Grouper: "+grouper+" Filter: "+filter);
-          this._tasks = this._tasks.map(task => ({
-            ...task,
-            Complete: Math.trunc(task.Complete * 100)
-          }));
-          
+          if(tasks.length > 0){
+            for(let i=0; i < tasks.length ; i++){
+              tasks[i].Complete = Math.trunc(tasks[i].Complete * 100); 
+            }
+          }          
           return tasks;
             //console.log(groupedArray);  
       } catch (error) {
@@ -394,21 +394,19 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
 
         this._sysError = true;
         this._environmentMessage = error;
-        this.render();  
         return [];
       }
     }else{
       //if(this.properties.showLog) console.error("List not found for:", this.properties.projectName);
       MessageLog("List not found for: "+ this.properties.projectName,"_getTaskListItems",this.MsgError,this.properties.showLog);
       this._sysError = true;
-      this.render();  
       return [];
     }
   }
 
   private _onGetGateListItems = async (): Promise<void> => {
     this._gates = await this._getGateListItems();
-    this.render();
+    //this.render();
   }
 
   private async _getGateListItems(): Promise<IGateListItem[]> {
@@ -431,14 +429,14 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
         if(this.properties.showLog) console.error("Error fetching gate list items:", error);
         this._sysError = true;
         this._environmentMessage = error;
-        this.render();  
+        //this.render();  
         return [];
       }
     }else{
       //if(this.properties.showLog) console.error("Gate- List not found for: ", this.properties.projectName);
       MessageLog("Gate- List not found for: "+ this.properties.projectName,"_getGateListItems",this.MsgError,this.properties.showLog);
       this._sysError = true;
-      this.render();  
+      //this.render();  
       return [];
     }
 

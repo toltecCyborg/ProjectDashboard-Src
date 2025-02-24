@@ -11,7 +11,7 @@ interface TaskCardProps {
 
 const TaskCard: React.FC<TaskCardProps> = ({ task, showDetails }) => {
   const getCardDelay = (delay: number, complete: number) => {
-    if (complete === 1) return styles.blackFont;
+    if (complete === 100) return styles.blackFont;
     if (delay === 0) return styles.greenFont;
     if (delay > 0 && delay <= 7) return styles.yellowFont;
     if (delay > 7) return styles.redFont;

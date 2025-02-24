@@ -62,7 +62,7 @@ export default class ProjectDashboard extends React.Component<
             >
               <h3> {project.Title} </h3>
             </a>
-            {spGateListItems && (
+            {spGateListItems.length>0 && (
               <a
                 onClick={() => {
                   this.setState({ showDetails: !showDetails });

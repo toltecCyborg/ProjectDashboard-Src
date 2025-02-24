@@ -14,14 +14,14 @@ interface DashboardProps {
 
 const Dashboard: React.FC<DashboardProps> = ({ gates, project, baseURL }) => {
   const getCardColor = (delay: number, complete: number) => {
-    if (complete === 1) return "green";
+    if (complete === 100) return "green";
     if (delay > 0 && delay <= 7) return "yellow";
     if (delay > 7) return "red";
     return "white"; // Default Class
   };
 
   const getCardDelay = (delay: number, complete: number) => {
-    if (complete === 1) return "white";
+    if (complete === 100) return "white";
     if (delay === 0) return "black";
     if (delay > 0 && delay <= 7) return "darkred";
     if (delay > 7) return "darkyellow";
@@ -29,7 +29,7 @@ const Dashboard: React.FC<DashboardProps> = ({ gates, project, baseURL }) => {
   };
 
   const getCardBorder = (delay: number, complete: number) => {
-    if (complete === 1) return "white";
+    if (complete === 100) return "white";
     if (delay === 0) return "grey";
     if (delay > 0 && delay <= 7) return "white";
     if (delay > 7) return "white";
