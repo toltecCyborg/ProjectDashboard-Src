@@ -60,12 +60,6 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
     this.context.dynamicDataSourceManager.initializeSource(this);
     this._projects = await this._getProjectListItems();
     this._projectSelected = this._getProjectInfo(this.properties.projectName);
-
-    if(this._projectSelected.isPlanner){
-      await this._onGetPlannerListItems();
-    }else{
-      await this._onGetTaskListItems();
-    }
     
     await this._onReset(); 
      
@@ -84,7 +78,7 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
       ProjectDashboard,
       {
         spGateListItems: this._gates,
-        onGetGateListItems: this._onReset,
+        onReset: this._onReset,
         spTaskListItems: this._tasks,
         spFilteredTaskItems: this._filteredTasks,
         onGetTaskListItems: this._onGetTaskListItems,
@@ -221,6 +215,12 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
   /** */
   private _onReset = async (): Promise<void> => {
     this._sysError = false;
+
+    if(this._projectSelected.isPlanner){
+      await this._onGetPlannerListItems();
+    }else{
+      await this._onGetTaskListItems();
+    } 
 
     await this._onGetGateListItems(); 
 
@@ -381,12 +381,14 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
           const responseJson = await response.json();
           const tasks : ITaskListItem[] = responseJson.value as ITaskListItem[];
           //console.log("Project: " + project + " Grouper: "+grouper+" Filter: "+filter);
-          if(tasks.length > 0){
+          if(tasks.length > 0){            
             for(let i=0; i < tasks.length ; i++){
               tasks[i].Complete = Math.trunc(tasks[i].Complete * 100); 
             }
           }          
-          return tasks;
+          const sortedItems = [...tasks].sort((a, b) => b.Title.localeCompare(a.Title));
+ 
+          return sortedItems;
             //console.log(groupedArray);  
       } catch (error) {
         if(this.properties.showLog) console.error("[_getTaskListItems] Error fetching gate list items:", error);

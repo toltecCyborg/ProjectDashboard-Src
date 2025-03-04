@@ -18,8 +18,8 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, showDetails }) => {
     return styles.blackFont; // Default Class
   };
   return (
-    <div className="task-card">
-      <h1 className="task-title">{task.Task}</h1>
+    <div className={styles["task-card"]}>
+      <h1 className={styles["task-title"]}>{task.Task}</h1>
 
       <table className="table table-striped table-bordered">
         <tbody>
@@ -31,25 +31,25 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, showDetails }) => {
           </tr>
           <tr
             className={`${styles["task-card"]} ${getCardDelay(
-              GetDelay(task.Finish,task.ActualFinish),
+              GetDelay(task.Finish, task.ActualFinish),
               task.Complete
             )}`}
-            >
+          >
             <td>
               <strong>Completion:</strong>
             </td>
-            <td>{(Math.floor(task.Complete ))}%</td>
+            <td>{Math.floor(task.Complete)}%</td>
           </tr>
           <tr
             className={`${styles["task-card"]} ${getCardDelay(
-              GetDelay(task.Finish,task.ActualFinish),
+              GetDelay(task.Finish, task.ActualFinish),
               task.Complete
             )}`}
-            >
+          >
             <td>
               <strong>Delay:</strong>
             </td>
-            <td>{GetDelay(task.Finish,task.ActualFinish)} days</td>
+            <td>{GetDelay(task.Finish, task.ActualFinish)} days</td>
           </tr>
           <tr>
             <td>
@@ -76,7 +76,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, showDetails }) => {
             <td>{task.Effort}</td>
           </tr>
 
-          {showDetails && (            
+          {showDetails && (
             <>
               <tr>
                 <td>
@@ -106,31 +106,26 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, showDetails }) => {
           )}
           {true && (
             <>
-            <tr>
-              <td>
-                <strong>Responsible:</strong>
-              </td>
-              <td>
-                <a
-                  href={task.Responsible?.Url}
-                  target="_blank"
-                >{task.Responsible?.Description}
-                </a>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <strong>EvidenceOfCompletion:</strong>
-              </td>
-              <td>        
-                <a
-                  href={task.EvidenceOfCompletion?.Url}
-                  target="_blank"
-                >{task.EvidenceOfCompletion?.Description}
-                </a>
-              </td>
-            </tr>
-            
+              <tr>
+                <td>
+                  <strong>Responsible:</strong>
+                </td>
+                <td>
+                  <a href={task.Responsible?.Url} target="_blank">
+                    {task.Responsible?.Description}
+                  </a>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>EvidenceOfCompletion:</strong>
+                </td>
+                <td>
+                  <a href={task.EvidenceOfCompletion?.Url} target="_blank">
+                    {task.EvidenceOfCompletion?.Description}
+                  </a>
+                </td>
+              </tr>
             </>
           )}
         </tbody>

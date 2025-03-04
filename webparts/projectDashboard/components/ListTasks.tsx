@@ -3,7 +3,7 @@ import { useState } from "react";
 import { ITaskListItem } from "../../../models";
 import { GetDelay } from "./GetDelay";
 import { GetFormatDate } from "./GetFormatDate";
-//import "~@bootstrap/;
+import styles from "./ProjectDashboard.module.scss";
 
 interface ListGroupProps {
   items: ITaskListItem[];
@@ -30,7 +30,7 @@ const ListTasks = ({
           ).length) > 0 && (
         <div>
           <h1>{heading}</h1>
-          <table className="table table-striped table-bordered">
+          <table className={styles["ed2Table"]}>
             <thead>
               <tr>
                 <th>Task</th>
@@ -60,7 +60,7 @@ const ListTasks = ({
                 >
                   <td>{item.Task}</td>
                   <td>{Math.floor(item.Complete)}% </td>
-                  <td>{GetDelay(item.Finish, item.ActualFinish)}</td>
+                  <td>{item.Effort}</td>
                   <td>{GetFormatDate(item.Finish)}</td>
                   <td>{GetFormatDate(item.ActualFinish)}</td>
                   <td>

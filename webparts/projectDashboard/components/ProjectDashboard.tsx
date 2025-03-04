@@ -62,7 +62,7 @@ export default class ProjectDashboard extends React.Component<
             >
               <h3> {project.Title} </h3>
             </a>
-            {spGateListItems.length>0 && (
+            {spGateListItems.length > 0 && (
               <a
                 onClick={() => {
                   this.setState({ showDetails: !showDetails });
@@ -194,7 +194,7 @@ export default class ProjectDashboard extends React.Component<
 
   private onReset(): void {
     //showDetails = false;
-    if (this.props.onGetGateListItems) this.props.onGetGateListItems();
+    if (this.props.onReset) this.props.onReset();
     this.setState({ allTasks: false });
     MessageLog("ProjectDashboar/onReset...");
   }

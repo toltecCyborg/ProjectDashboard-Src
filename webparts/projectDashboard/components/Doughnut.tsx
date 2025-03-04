@@ -14,7 +14,7 @@ interface ChartProps {
 const DoughnutChart: React.FC<ChartProps> = ({ gates }) => {
 
   const project: IGateListItem = GroupByProject(gates);
-  console.log("[DoughnutChart] gates: " + gates.length + "-" + project.Complete);
+  //console.log("[DoughnutChart] gates: " + gates.length + "-" + project.Complete);
 
   const getCardColor = (delay: number, complete: number) => {
     //console.log("Styles:" + delay + "-" + complete);

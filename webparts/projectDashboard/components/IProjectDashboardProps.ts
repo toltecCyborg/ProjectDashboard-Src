@@ -14,6 +14,7 @@ export interface IProjectDashboardProps {
   selectedTask:ITaskListItem;
   spGateListItems: IGateListItem[];
   onGetGateListItems?: ButtonClickedCallback;
+  onReset?: ButtonClickedCallback;
   onSelectItem: (item: string, group: string) => void;
   description: string;
   project: IProjectListItem;

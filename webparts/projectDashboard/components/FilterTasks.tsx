@@ -10,14 +10,14 @@ export function FilterTasks(
   //default
   let filteredArray = data.filter((row) => row.Title === filter);
 
-  //case initial conditions
-
   if (grouper === "gate" && filter === "actual" && data.length > 0) {
     //const gate = data[0].Title;
     filteredArray = data.filter(
-      (row) => row.Complete < 1 && GetDelay(row.Finish, row.ActualFinish) > 0
+      (row) => row.Complete < 100 && GetDelay(row.Finish, row.ActualFinish) > 0
     );
   }
+
+  //console.log("[FilterTasks] grouper: "+grouper+" filter: "+filter+" items: "+ data.length + " filter: "+filteredArray.length)
 
   return filteredArray;
 }

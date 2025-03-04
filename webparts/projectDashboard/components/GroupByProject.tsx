@@ -1,7 +1,7 @@
 import { IGateListItem } from "../../../models";
 
 // Función para agrupar
-export function GroupByProject(data: IGateListItem[]) {
+export function GroupByProject(gates: IGateListItem[]) {
   // const summary = data.reduce(
   //   (acc, item) => {
   //     acc.Complete += item.Complete ? item.Complete : 0; // Acumular "Complete"
@@ -22,6 +22,7 @@ export function GroupByProject(data: IGateListItem[]) {
   let start = new Date();
   let end = new Date();
   let actualEnd = new Date();
+  const data = [...gates].sort((a, b) => b.Title.localeCompare(a.Title));
 
   if (data.length > 0) {
     for (count = 0; count < data.length; count++) {
@@ -40,23 +41,6 @@ export function GroupByProject(data: IGateListItem[]) {
           : actualEnd;
     }
   }
-
-  console.log(
-    "[GetProjectSummary] Gates: " +
-      count +
-      " Complete: " +
-      complete +
-      " effort:" +
-      effort +
-      " delay:" +
-      delay +
-      " start:" +
-      start +
-      " end:" +
-      end +
-      " actualEnd:" +
-      actualEnd
-  );
 
   const summary: IGateListItem = {
     Id: "0",
