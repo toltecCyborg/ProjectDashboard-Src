@@ -3,17 +3,18 @@ import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, Title } from "chart.js";
 import { IGateListItem } from "../../../models";
 import ChartDataLabels from "chartjs-plugin-datalabels";
-import { GroupByProject } from "./GroupByProject";
+//import { GroupByProject } from "./GroupByProject";
 
 ChartJS.register(ArcElement, Tooltip, Legend, Title, ChartDataLabels);
 
 interface ChartProps {
   gates: IGateListItem[];
+  complete: number;
 }
 
-const DoughnutChart: React.FC<ChartProps> = ({ gates }) => {
+const DoughnutChart: React.FC<ChartProps> = ({ gates, complete }) => {
 
-  const project: IGateListItem = GroupByProject(gates);
+  //const project: IGateListItem = GroupByProject(gates);
   //console.log("[DoughnutChart] gates: " + gates.length + "-" + project.Complete);
 
   const getCardColor = (delay: number, complete: number) => {
@@ -57,7 +58,8 @@ const DoughnutChart: React.FC<ChartProps> = ({ gates }) => {
       const fontSize = (height / 80).toFixed(2);
       ctx.font = `${fontSize}em sans-serif`;
       ctx.textBaseline = "middle";
-      const text = project.Complete + "%";
+      const text = complete + "%";
+      //const text = GroupByProject(gates).Complete + "%";
       const textX = Math.round((width - ctx.measureText(text).width) / 2);
       const textY = height / 2;
 

@@ -5,7 +5,7 @@ import {
   type IPropertyPaneConfiguration,
   PropertyPaneTextField,
   PropertyPaneCheckbox,
-  PropertyPaneDropdown,
+//  PropertyPaneDropdown,
   PropertyPaneToggle
 } from '@microsoft/sp-property-pane';
 import { BaseClientSideWebPart } from '@microsoft/sp-webpart-base';
@@ -42,7 +42,7 @@ interface ErrorPageProps {
 
 export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProjectDashboardWebPartProps> {
 
-  private _projects: IProjectListItem[] = [];
+  //private _projects: IProjectListItem[] = [];
   private _tasks: ITaskListItem[] = [];
   private _filteredTasks: ITaskListItem[] = [];
   private _selectedTask: ITaskListItem;
@@ -58,13 +58,13 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
     this._sysError = false;
 
     this.context.dynamicDataSourceManager.initializeSource(this);
-    this._projects = await this._getProjectListItems();
+    //this._projects = await this._getProjectListItems();
     this._projectSelected = this._getProjectInfo(this.properties.projectName);
-    
+
     await this._onReset(); 
      
-    //return super.onInit();
-    await super.onInit();    
+    return super.onInit();
+    //await super.onInit();    
   }
 
 
@@ -83,8 +83,8 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
         spFilteredTaskItems: this._filteredTasks,
         onGetTaskListItems: this._onGetTaskListItems,
         selectedTask: this._selectedTask,
-        spProjectListItems: this._projects,
-        onGetProjectListItems: this._onGetProjectListItems,
+        //spProjectListItems: this._projects,
+        //onGetProjectListItems: this._onGetProjectListItems,
         //spPlannerListItems: this._plans,
         //onGetPlannerListItems: this._onGetPlannerListItems,
         onSelectItem: this._onSelectedItem,
@@ -130,13 +130,13 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
   }
 
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
-    const dropdownOptions = this._projects.map((project, index) => ({
-      key: project.Title,    
-      text: project.Title
-    }));
-    if (!this.properties.projectName && dropdownOptions.length > 0) {
-      this.properties.projectName = dropdownOptions[0].key; // Selecciona el primer key por defecto
-    }
+    // const dropdownOptions = this._projects.map((project, index) => ({
+    //   key: project.Title,    
+    //   text: project.Title
+    // }));
+    // if (!this.properties.projectName && dropdownOptions.length > 0) {
+    //   this.properties.projectName = dropdownOptions[0].key; // Selecciona el primer key por defecto
+    // }
 
     return {
       pages: [
@@ -148,20 +148,39 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
             {
               groupName: "Setup Project",
               groupFields: [              
-                PropertyPaneDropdown('projectName', {
-                  label: 'Select Project',
-                  options: dropdownOptions,
-                  selectedKey: this.properties.projectName,
+                PropertyPaneTextField('description', {
+                  label: "Project Name:",
+                  description: "Define the name to be shown in the header..."
                 }),
+              // PropertyPaneDropdown('description', {
+              //     label: 'Project Setup',
+              //     options: dropdownOptions,
+              //     selectedKey: this.properties.projectName,
+              //   }),
                 PropertyPaneToggle('isDashboard', {
                     label: 'Is Dashboard',
                     onText: 'On',
                     offText: 'Off'
                   }),
-                  PropertyPaneTextField('description', {
-                  label: "Prefix Header:"
-                }),
-                PropertyPaneToggle('showButtons', {
+                  PropertyPaneTextField('projectName', {
+                    label: "Project Name:",
+                    description: "Define the name to be shown in the header..."
+                  }),
+                  PropertyPaneTextField('sourceName', {
+                    label: "Source Name:",
+                    description: "Register the Plan or List name linked to the project..."
+                  }),
+                  PropertyPaneTextField('projectURL', {
+                    label: "Project URL:",
+                    description: "Register the URL to be opened clicking on project name..."
+
+                  }),
+                  PropertyPaneToggle('isPlanner', {
+                    label: 'Is Planner?',
+                    onText: 'On',
+                    offText: 'Off'
+                  }),
+                    PropertyPaneToggle('showButtons', {
                   label: 'Show Controls',
                   onText: 'On',
                   offText: 'Off'
@@ -198,16 +217,25 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
   }
 
   protected async onPropertyPaneFieldChanged(propertyPath: string, oldValue: string, newValue: string): Promise<void> {
-    if (propertyPath === 'filterValue') {
-      this.context.dynamicDataSourceManager.notifyPropertyChanged('filterValue');
+    if (propertyPath === 'projectUrl') {
+      if (!newValue.startsWith("https://")) {
+        alert("Please, register a valid URL to the SharePoint or Planner.");
+        this.properties.projectURL = oldValue; // Restaurar el valor anterior
+      }
+    }
+    if (propertyPath === 'sourceName' && newValue !== oldValue) {
+      //if(this.properties.showLog) console.log(`Selected Project Changed: ${newValue}`); // Maneja el evento
+      MessageLog(`Selected Project Changed: ${newValue}`,"",this.MsgInfo,this.properties.showLog);
+      this.properties.sourceName = newValue; // Actualiza el valor
+      await this._onProjectChange(newValue); // Dispara tu función personalizada
+      super.onPropertyPaneFieldChanged(propertyPath, oldValue, newValue);
     }
     if (propertyPath === 'projectName' && newValue !== oldValue) {
       //if(this.properties.showLog) console.log(`Selected Project Changed: ${newValue}`); // Maneja el evento
-      MessageLog(`Selected Project Changed: ${newValue}`,"",this.MsgInfo,this.properties.showLog);
+      MessageLog(`Project Name Changed: ${newValue}`,"",this.MsgInfo,this.properties.showLog);
       this.properties.projectName = newValue; // Actualiza el valor
-      await this._onProjectChange(newValue); // Dispara tu función personalizada
-    }
       super.onPropertyPaneFieldChanged(propertyPath, oldValue, newValue);
+    }
   }
   
 
@@ -222,11 +250,12 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
       await this._onGetTaskListItems();
     } 
 
-    await this._onGetGateListItems(); 
+    if(this._tasks.length > 0){
+      await this._onGetGateListItems(); 
+      this._filteredTasks = FilterTasks(this._tasks, "gate", "actual");  
+    }
 
-    this._filteredTasks = FilterTasks(this._tasks, "gate", "actual");
     this._selectedTask = this.newTask();
-
     this.render();
 
   }
@@ -241,13 +270,20 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
 
     // Obtener los detalles del plan y almacenarlos en _plan
     try {
-      const groupId = await this.getGroupId(); // Obtener el ID del grupo
-      const planName = "PlanCascade";
-      const planDetails = await plannerService.getPlanDetails(groupId, planName);
-      this._tasks = planDetails ? planDetails : [] ;
-
-      //console.log("[_onGetPlannerListItems] Group:"+groupId + " Plan: " + planName + " Bucket. " + this._plans[0].Title + " task. " + this._plans[0].Task);
-
+      //const groupId = await this.getGroupId(); // Obtener el ID del grupo
+      //const planName = "PlanCascade";
+      //const planId = await plannerService.getPlanId(groupId, planName);
+      if(this._projectSelected.ListName.length > 0){
+        const planId = this._projectSelected.ListName;
+        const planDetails = await plannerService.getPlanDetails(planId);
+        this._tasks = planDetails ? planDetails : [] ;
+  
+        MessageLog(" Plan: " + planId + " Bucket. " + planDetails[0].Title + " task. " + planDetails[0].Task,"_onGetPlannerListItems",this.MsgInfo,this.properties.showLog);  
+      }else{
+        MessageLog(" Plan : " + this._projectSelected.ListName + " was not found... " ,"_onGetPlannerListItems",this.MsgError,this.properties.showLog);  
+        this._projectSelected = this._getProjectInfo(this.properties.projectName);
+      }
+  
     } catch (error) {
       console.error("Error loading plan details:", error);
     }
@@ -256,22 +292,22 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
    }
 
   // Método para obtener el ID del grupo
-  private async getGroupId(): Promise<string> {
-    // const grpId =  "5c933eeb-3c3d-4610-8437-4daa637dfcd4";
-    // console.log("getGroupId: "+grpId);
-    let getQuery = `${this.context.pageContext.web.absoluteUrl}/_api/site?$select=GroupId`;
-    if(!getQuery.includes("/sites/ED2-Team")){
-      getQuery = `${this.context.pageContext.web.absoluteUrl}/sites/ED2-Team/_api/site?$select=GroupId`;
-    }
-    // console.log(getQuery );
+  // private async getGroupId(): Promise<string> {
+  //   // const grpId =  "5c933eeb-3c3d-4610-8437-4daa637dfcd4";
+  //   // console.log("getGroupId: "+grpId);
+  //   let getQuery = `${this.context.pageContext.web.absoluteUrl}/_api/site?$select=GroupId`;
+  //   if(!getQuery.includes("/sites/ED2-Team")){
+  //     getQuery = `${this.context.pageContext.web.absoluteUrl}/sites/ED2-Team/_api/site?$select=GroupId`;
+  //   }
+  //   // console.log(getQuery );
       
-    const response = await this.context.spHttpClient.get(getQuery,
-      SPHttpClient.configurations.v1 // Acceso estático a configurations
-    );
+  //   const response = await this.context.spHttpClient.get(getQuery,
+  //     SPHttpClient.configurations.v1 // Acceso estático a configurations
+  //   );
     
-    const data = await response.json();
-    return data.GroupId;
-  }
+  //   const data = await response.json();
+  //   return data.GroupId;
+  // }
 
   // Método personalizado para manejar el cambio
   private async _onProjectChange(projectName: string): Promise<void> {
@@ -292,49 +328,61 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
   }
 
   private _getProjectInfo (planName: string): IProjectListItem { 
-    const result  =  this._projects.find((item) => item.Title === planName) ;
-    if(result !== undefined){
-      this._projectSelected = result;
-      //MessageLog(this.properties.projectName +" - result: "+result?.ListName+ " Final: "+this._projectSelected.ListName+ " Link: "+ this._projectSelected.Link.Url,"_getProjectInfo",this.MsgInfo,this.properties.showLog);
-      MessageLog(this.properties.projectName +" - result: "+result?.ListName+ " Final: "+this._projectSelected.ListName,"_getProjectInfo",this.MsgInfo,this.properties.showLog);
-      return result;
-    } else{
-      MessageLog("planName not found: "+ this.properties.projectName ,"_getProjectInfo",this.MsgError,this.properties.showLog);
+    
+    let projectInfo : IProjectListItem = {
+      Id: this.properties.sourceName,
+      Title: this.properties.projectName, 
+      isPlanner: this.properties.isPlanner, 
+      ListName: this.properties.sourceName, 
+      Link: {Url:this.properties.projectURL, Description:this.properties.projectName}
+    };
+    this._projectSelected = projectInfo;
+    MessageLog(this._projectSelected.Id+" - "+this._projectSelected.Link.Description+" - "+this._projectSelected.Link.Url+" - "+this._projectSelected.ListName+" - "+this._projectSelected.Title+" - "+this._projectSelected.isPlanner,"_getProjectInfo",this.MsgInfo,this.properties.showLog);
+    return projectInfo;
 
-      const nullProj : IProjectListItem = {
-        Id: "",
-        Title: "", 
-        isPlanner: false, 
-        ListName: "", 
-        Link: {Url:"", Description:""}
-      };
-      return nullProj ;
-    }   
+    // const result  =  this._projects.find((item) => item.Title === planName) ;
+    // if(result !== undefined){
+    //   this._projectSelected = result;
+    //   //MessageLog(this.properties.projectName +" - result: "+result?.ListName+ " Final: "+this._projectSelected.ListName+ " Link: "+ this._projectSelected.Link.Url,"_getProjectInfo",this.MsgInfo,this.properties.showLog);
+    //   MessageLog(this.properties.projectName +" - result: "+result?.ListName+ " Final: "+this._projectSelected.ListName,"_getProjectInfo",this.MsgInfo,this.properties.showLog);
+    //   return result;
+    // } else{
+    //   MessageLog("planName not found: "+ this.properties.projectName ,"_getProjectInfo",this.MsgError,this.properties.showLog);
+
+    //   const nullProj : IProjectListItem = {
+    //     Id: "",
+    //     Title: "", 
+    //     isPlanner: false, 
+    //     ListName: "", 
+    //     Link: {Url:"", Description:""}
+    //   };
+    //   return nullProj ;
+    // }   
   }
 
-  private _onGetProjectListItems = async (): Promise<void> => {
-    const response: IProjectListItem[] = await this._getProjectListItems();
-    this._projects = response;    
+  // private _onGetProjectListItems = async (): Promise<void> => {
+  //   const response: IProjectListItem[] = await this._getProjectListItems();
+  //   this._projects = response;    
   
-    //this.render();
-   }
+  //   //this.render();
+  //  }
 
-  private async _getProjectListItems(): Promise<IProjectListItem[]> {
+  // private async _getProjectListItems(): Promise<IProjectListItem[]> {
    
-    const response = await this.context.spHttpClient.get(
-      //this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('Projects')/items?$select=Id,Title, ListName, Link `,
-      this._siteUrl + `/_api/web/lists/getbytitle('Projects')/items?$select=Id,Title, ListName, Link, isPlanner `,
-      SPHttpClient.configurations.v1);
+  //   const response = await this.context.spHttpClient.get(
+  //     //this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('Projects')/items?$select=Id,Title, ListName, Link `,
+  //     this._siteUrl + `/_api/web/lists/getbytitle('Projects')/items?$select=Id, Title, ListName, Link, isPlanner `,
+  //     SPHttpClient.configurations.v1);
   
-    if (!response.ok) {
-      this._sysError = true;
-      const responseText = await response.text();
-      throw new Error(responseText);
-    }
+  //   if (!response.ok) {
+  //     this._sysError = true;
+  //     const responseText = await response.text();
+  //     throw new Error(responseText);
+  //   }
   
-    const responseJson = await response.json();
-    return responseJson.value as IProjectListItem[];
-  }
+  //   const responseJson = await response.json();
+  //   return responseJson.value as IProjectListItem[];
+  // }
 
   private _onSelectedItem = async (item: string, group: string): Promise<void> => {
     

@@ -22,12 +22,15 @@
     "description": { "default": "ProjectDashboard description" },
     "officeFabricIconFontName": "Page",
     "properties": {
-      "description": "Project: ",
+      "description": "Create a plan in planner and register their Id as Source Name... ",
       "refreshInterval": "5000",
-      "projectName": "RF Cascade",
+      "projectName": "Plan Template",
+      "sourceName": "v-GYUc-0Jkqnqzs9WcCCjmUADgfe",
+      "projectURL": "https://ed2corp.sharepoint.com/sites/home",
+      "isPlanner": true,
       "isDashboard": true,
       "showButtons": true,
-      "showLog": false
+      "showLog": true
     }
   }]
 }

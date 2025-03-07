@@ -16,7 +16,12 @@ export interface IBucketItem {
 
 export interface ITaskDetails {
   id: string;
-  name: string;
+  references: string;
+}
+
+export interface ITaskReference {
+  id: string;
+  references: string;
 }
 
 export class PlannerService {
@@ -27,25 +32,21 @@ export class PlannerService {
   }
 
   // Obtener los detalles de un plan de Planner
-  public async getPlanDetails(groupId: string, planName: string): Promise<ITaskListItem[]> {
+  public async getPlanDetails(planId: string): Promise<ITaskListItem[]> {
     try {
-
-      const planId = await this.getPlanId(groupId, planName);
-
-     // console.log("[getPlanDetails] planId : "+planId);
+      console.log("[getPlanDetails] planId : "+planId);
 
       if (!planId) {
-        throw new Error("Plan not found");
+        throw new Error("Plan not defined");
       }
-      
-    
+          
       // Obtener las tareas del plan
       const bucketsResponse = await this.graphClient
         .api(`/planner/plans/${planId}/buckets`)
         .get();
         
       const buckets: IBucketItem[] = bucketsResponse.value; // Accede a `value`
-      //console.log("[getPlanDetails] buckets:", buckets);
+      console.log("[getPlanDetails] buckets:", buckets);
 
       // Obtener las tareas del plan
       const tasksResponse = await this.graphClient
@@ -111,7 +112,7 @@ export class PlannerService {
   }
 
   // Obtener el ID del plan por nombre
-  private async getPlanId(groupId: string, planName: string): Promise<string > {
+  public async getPlanId(groupId: string, planName: string): Promise<string > {
     //console.log("[getPlanId] groupId: "+groupId + " planName:"+planName )
     
     try{
@@ -139,4 +140,33 @@ export class PlannerService {
     }
     return "";
   }
-}
+
+//   private async getTaskDetail(taskId: string : Promise<string > {
+//     //console.log("[getPlanId] groupId: "+groupId + " planName:"+planName )
+    
+//     try{
+//       const plansResponse = await this.graphClient
+//       .api(`/groups/${groupId}/planner/plans`)
+//       .get();
+         
+//       const plans: IPlanItem[] = plansResponse.value; // Accede a `value`    
+
+//       if(plans.length > 0 ){
+//         const plan = plans.find((p: any) => p.title === planName);
+
+//         //console.log("[getPlanId] plan: "+plan?.id + " Name: "+plan?.title)
+//         //ToDo: To Correct Hardcode
+//         return plan ? plan.id : "";  
+//       } else {
+//         console.log("[getPlanId] Error fetching plan details...");
+//         //ToDo: To Correct Hardcode
+//         return "";
+//       }
+
+//     }catch (error) {
+//       console.error("[getPlanId] Error fetching plan details:", error);
+//       throw error;
+//     }
+//     return "";
+//   }
+ }

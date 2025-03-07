@@ -1,7 +1,7 @@
 import * as React from "react";
 import styles from "./ProjectDashboard.module.scss";
 import type { IProjectDashboardProps } from "./IProjectDashboardProps";
-import { escape } from "@microsoft/sp-lodash-subset";
+//import { escape } from "@microsoft/sp-lodash-subset";
 //import { useState } from "react";
 import { Switch } from "@fluentui/react-components";
 import ProgressTasks from "./ProgressTasks";
@@ -10,25 +10,27 @@ import TaskCard from "./TaskCard";
 import ListTasks from "./ListTasks";
 import { MessageLog } from "./MessageLog";
 import DoughnutChart from "./Doughnut";
+import { GroupByProject } from "./GroupByProject";
 
 //import type { SwitchProps } from "@fluentui/react-components";
 
 interface IProjectDashboardState {
   // showProjects: boolean;
   allTasks: boolean;
+  showTasks: boolean;
   showDetails: boolean;
 }
 export default class ProjectDashboard extends React.Component<
   IProjectDashboardProps,
   IProjectDashboardState
 > {
-  private _showTasks: boolean = true;
-
+  
   constructor(props) {
     super(props);
     this.state = {
       // showProjects: false,
       allTasks: false,
+      showTasks: true,
       showDetails: false,
     };
   }
@@ -49,19 +51,37 @@ export default class ProjectDashboard extends React.Component<
       project,
     } = this.props;
 
-    const { showDetails, allTasks } = this.state;
+    const { showDetails, allTasks, showTasks } = this.state;
 
     return (
       <>
         {this.props.isDashboard && (
           <div className="task-card">
-            <a
-              //          href="https://ed2corp.sharepoint.com/sites/ED2Team/SitePages/SW_RFCascade.aspx"
-              href={project.Link.Url}
-              target="_blank"
-            >
-              <h3> {project.Title} </h3>
-            </a>
+            <div id="progress-header" className={styles["rowContainer"]}>
+              <button
+                type="button"
+                className={styles["iconButton"]}
+                onClick={() => {
+                  this.onReset();
+                }}
+              >
+                <img
+                  alt=""
+                  src={require("../assets/Restart.jpg")}
+                  className={styles["iconImage"]}
+                />
+              </button>
+              <div>
+                <a
+                  //          href="https://ed2corp.sharepoint.com/sites/ED2Team/SitePages/SW_RFCascade.aspx"
+                  href={project.Link.Url}
+                  target="_blank"
+                >
+                  <h2> {project.Title} </h2>
+                </a>
+              </div>
+            </div>
+
             {spGateListItems.length > 0 && (
               <a
                 onClick={() => {
@@ -69,12 +89,12 @@ export default class ProjectDashboard extends React.Component<
                 }}
               >
                 <div>
-                  <DoughnutChart gates={spGateListItems} />
+                  <DoughnutChart gates={spGateListItems} complete={GroupByProject(spGateListItems).Complete} />
                 </div>
               </a>
             )}
-            {!spGateListItems && (
-              <h1>Without info defined for the project... </h1>
+            {spGateListItems.length === 0 && (
+              <h1>Review your plan setup (unable to reach the info)... </h1>
             )}
           </div>
         )}
@@ -89,11 +109,13 @@ export default class ProjectDashboard extends React.Component<
               <div className={styles.buttons}>
                 <Switch
                   label="List Tasks"
-                  checked={this._showTasks}
+                  checked={showTasks}
                   onChange={(ev) => {
-                    this._showTasks = ev.currentTarget.checked;
-                    //this.handleSwitchTaskChange(ev.currentTarget.checked);
-                    this.onGetTaskListItemsChanged();
+                    this.setState({ showTasks: ev.currentTarget.checked });
+
+                    // this._showTasks = ev.currentTarget.checked;
+                    // //this.handleSwitchTaskChange(ev.currentTarget.checked);
+                    // this.onGetTaskListItemsChanged();
                   }}
                 />
                 <Switch
@@ -106,27 +128,6 @@ export default class ProjectDashboard extends React.Component<
               </div>
             )}
             <div className={styles["columnContainer"]}>
-              <div id="progress-header" className={styles["rowContainer"]}>
-                <button
-                  type="button"
-                  className={styles["iconButton"]}
-                  onClick={() => {
-                    this.onReset();
-                  }}
-                >
-                  <img
-                    alt=""
-                    src={require("../assets/Restart.jpg")}
-                    className={styles["iconImage"]}
-                  />
-                </button>
-                <div>
-                  <h2>
-                    {this.props.description + " "}
-                    <strong>{escape(project.Title)}</strong>{" "}
-                  </h2>
-                </div>
-              </div>
               <div id="progress-body">
                 {spGateListItems && (
                   <>
@@ -163,7 +164,7 @@ export default class ProjectDashboard extends React.Component<
                   }
                 </>
               )}
-            {this._showTasks && spTaskListItems.length > 0 && (
+            {showTasks && spTaskListItems.length > 0 && (
               <ListTasks
                 items={allTasks ? spTaskListItems : spFilteredTaskItems}
                 heading={
@@ -196,12 +197,13 @@ export default class ProjectDashboard extends React.Component<
     //showDetails = false;
     if (this.props.onReset) this.props.onReset();
     this.setState({ allTasks: false });
+    this.setState({ showTasks: true });
     MessageLog("ProjectDashboar/onReset...");
   }
 
-  private onGetTaskListItemsChanged = (): void => {
-    if (this.props.onGetTaskListItems) this.props.onGetTaskListItems();
-  };
+  // private onGetTaskListItemsChanged = (): void => {
+  //   if (this.props.onGetTaskListItems) this.props.onGetTaskListItems();
+  // };
 
   componentDidMount(): void {
     // Cargar datos al iniciar

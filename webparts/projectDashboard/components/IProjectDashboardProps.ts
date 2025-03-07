@@ -6,8 +6,6 @@ import {
 } from '../../../models';
 
 export interface IProjectDashboardProps {
-  spProjectListItems: IProjectListItem[];
-  onGetProjectListItems?: ButtonClickedCallback;
   spTaskListItems: ITaskListItem[];
   spFilteredTaskItems: ITaskListItem[];
   onGetTaskListItems?: ButtonClickedCallback;
