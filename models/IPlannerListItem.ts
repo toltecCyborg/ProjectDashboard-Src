@@ -13,4 +13,7 @@ export interface IPlannerListItem {
   bucketId: string;
   planName?: string;
   bucketName?: string;
+  attachementUrl? : string;
+  attachementDescription?: string;
+  
 }

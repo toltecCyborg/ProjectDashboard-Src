@@ -67,7 +67,6 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
     //await super.onInit();    
   }
 
-
   protected onDispose(): void {
     ReactDom.unmountComponentAtNode(this.domElement);
   }
@@ -123,7 +122,6 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
 
     
   }
-
 
   protected get dataVersion(): Version {
     return Version.parse('1.0');
@@ -291,23 +289,6 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
     //this.render();
    }
 
-  // Método para obtener el ID del grupo
-  // private async getGroupId(): Promise<string> {
-  //   // const grpId =  "5c933eeb-3c3d-4610-8437-4daa637dfcd4";
-  //   // console.log("getGroupId: "+grpId);
-  //   let getQuery = `${this.context.pageContext.web.absoluteUrl}/_api/site?$select=GroupId`;
-  //   if(!getQuery.includes("/sites/ED2-Team")){
-  //     getQuery = `${this.context.pageContext.web.absoluteUrl}/sites/ED2-Team/_api/site?$select=GroupId`;
-  //   }
-  //   // console.log(getQuery );
-      
-  //   const response = await this.context.spHttpClient.get(getQuery,
-  //     SPHttpClient.configurations.v1 // Acceso estático a configurations
-  //   );
-    
-  //   const data = await response.json();
-  //   return data.GroupId;
-  // }
 
   // Método personalizado para manejar el cambio
   private async _onProjectChange(projectName: string): Promise<void> {
@@ -340,49 +321,7 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
     MessageLog(this._projectSelected.Id+" - "+this._projectSelected.Link.Description+" - "+this._projectSelected.Link.Url+" - "+this._projectSelected.ListName+" - "+this._projectSelected.Title+" - "+this._projectSelected.isPlanner,"_getProjectInfo",this.MsgInfo,this.properties.showLog);
     return projectInfo;
 
-    // const result  =  this._projects.find((item) => item.Title === planName) ;
-    // if(result !== undefined){
-    //   this._projectSelected = result;
-    //   //MessageLog(this.properties.projectName +" - result: "+result?.ListName+ " Final: "+this._projectSelected.ListName+ " Link: "+ this._projectSelected.Link.Url,"_getProjectInfo",this.MsgInfo,this.properties.showLog);
-    //   MessageLog(this.properties.projectName +" - result: "+result?.ListName+ " Final: "+this._projectSelected.ListName,"_getProjectInfo",this.MsgInfo,this.properties.showLog);
-    //   return result;
-    // } else{
-    //   MessageLog("planName not found: "+ this.properties.projectName ,"_getProjectInfo",this.MsgError,this.properties.showLog);
-
-    //   const nullProj : IProjectListItem = {
-    //     Id: "",
-    //     Title: "", 
-    //     isPlanner: false, 
-    //     ListName: "", 
-    //     Link: {Url:"", Description:""}
-    //   };
-    //   return nullProj ;
-    // }   
   }
-
-  // private _onGetProjectListItems = async (): Promise<void> => {
-  //   const response: IProjectListItem[] = await this._getProjectListItems();
-  //   this._projects = response;    
-  
-  //   //this.render();
-  //  }
-
-  // private async _getProjectListItems(): Promise<IProjectListItem[]> {
-   
-  //   const response = await this.context.spHttpClient.get(
-  //     //this.context.pageContext.web.absoluteUrl + `/_api/web/lists/getbytitle('Projects')/items?$select=Id,Title, ListName, Link `,
-  //     this._siteUrl + `/_api/web/lists/getbytitle('Projects')/items?$select=Id, Title, ListName, Link, isPlanner `,
-  //     SPHttpClient.configurations.v1);
-  
-  //   if (!response.ok) {
-  //     this._sysError = true;
-  //     const responseText = await response.text();
-  //     throw new Error(responseText);
-  //   }
-  
-  //   const responseJson = await response.json();
-  //   return responseJson.value as IProjectListItem[];
-  // }
 
   private _onSelectedItem = async (item: string, group: string): Promise<void> => {
     
