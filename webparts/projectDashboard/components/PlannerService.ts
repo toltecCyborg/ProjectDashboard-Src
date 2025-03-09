@@ -1,3 +1,4 @@
+/* eslint-disable require-atomic-updates */
 /* eslint-disable guard-for-in */
 import { MSGraphClientV3 } from "@microsoft/sp-http";
 import { IPlannerListItem, ITaskListItem } from "../../../models";
@@ -15,8 +16,10 @@ export interface IBucketItem {
 }
 
 export interface IAttachements {
-  Description: string;
-  Url: string;
+  EvidenceOfCompletion: {
+    Url: string,
+    Description: string
+  }
 }
 
 export class PlannerService {
@@ -49,18 +52,7 @@ export class PlannerService {
         .get();
 
       const tasks: IPlannerListItem[] = tasksResponse.value; // Accede a `value`
-      
-      if(tasks.length > 0){            
-        for(let i=0; i < tasks.length ; i++){          
-          const attachments = this.getAttachements(tasks[i].id) ;
-          if((await attachments).Description.length > 0){
-            tasks[i].attachementUrl = (await attachments).Url;
-            tasks[i].attachementDescription = (await attachments).Description;
-            console.log(`<a href="${tasks[i].attachementUrl}" target="_blank">${tasks[i].attachementDescription}</a>`);
-          }           
-        }
-      }   
- 
+           
       // Mapear los datos a la interfaz IPlanListItem
       return Object.values(tasks).map((task: IPlannerListItem) => ({
         Id: task.id,
@@ -83,31 +75,66 @@ export class PlannerService {
     }
   }
 
-  // private async populateAttachements(taskId: string): Promise<IAttachements > {
+  public async populateAttachements(tasks: ITaskListItem[] ) : Promise<ITaskListItem[]> {
+    if(tasks.length > 0){            
+      for(let i=0; i < tasks.length ; i++){          
+        const attachments = this.getAttachements(tasks[i].Id) ;
+        if((await attachments).EvidenceOfCompletion?.Description){
+          tasks[i].EvidenceOfCompletion = (await attachments).EvidenceOfCompletion;
+          // tasks[i].AttachementUrl = (await attachments).Url;
+          // tasks[i].AttachementDescription = (await attachments).Description;
+          console.log(`<a href="${tasks[i].EvidenceOfCompletion?.Url}" target="_blank">${tasks[i].EvidenceOfCompletion?.Description}</a>`);
+          //console.log(`<a href="${tasks[i].AttachementUrl}" target="_blank">${tasks[i].AttachementDescription}</a>`);
+        }           
+      }
+    }   
+    return tasks;
 
-  // }
+    // return Object.values(tasks).map((task: IPlannerListItem) => ({
+    //   id: task.id,
+    //   title: task.title,
+    //   orderHint: task.orderHint,
+    //   startDateTime: task.startDateTime,
+    //   dueDateTime: task.dueDateTime,
+    //   completedDateTime: task.completedDateTime,
+    //   percentComplete: task.percentComplete,
+    //   priority: task.priority,
+    //   checklistItemCount: task.checklistItemCount,
+    //   activeChecklistItemCount: task.activeChecklistItemCount,
+    //   planId: task.planId,
+    //   bucketId: task.bucketId,
+    //   planName: task.planName,
+    //   bucketName: task.bucketName,
+    //   attachementUrl : task.attachementUrl,
+    //   attachementDescription: task.attachementDescription,
+    // }))
+    // ; 
+  }
+
   private async getAttachements(taskId: string): Promise<IAttachements > {
     let attachement: IAttachements = {
-          Url : "",
-          Description : "",
-        }
-        const taskDetails = await this.graphClient
-        .api(`/planner/tasks/${taskId}/details`)
-        .get();
+      EvidenceOfCompletion: {
+        Url: "",
+        Description: ""
+      }
+    }
+    const taskDetails = await this.graphClient
+    .api(`/planner/tasks/${taskId}/details`)
+    .get();
 
-        if (taskDetails.references)
-        {
-          const references = taskDetails.references;
-          for (const encodedUrl in references) {
-            const decodedUrl = decodeURI(decodeURIComponent(encodedUrl)); // Decodificar la URL
-            const filename = references[encodedUrl].alias; // Obtener el nombre del archivo
-            attachement.Url = decodedUrl;
-            attachement.Description = filename;
-            //console.log(`<a href="${attachement.Url}" target="_blank">${attachement.Description}</a>`);
-          }  
-          //console.log("[getAttachements] References - " + references.length + " - " + taskId + " ; "+ attachement.Description+ " => " + attachement.Url);
-            
-        }
+    if (taskDetails.references)
+    {
+      const references = taskDetails.references;
+      for (const encodedUrl in references) {
+        const decodedUrl = decodeURI(decodeURIComponent(encodedUrl)); // Decodificar la URL
+        const filename = references[encodedUrl].alias; // Obtener el nombre del archivo        
+        attachement.EvidenceOfCompletion.Url = decodedUrl || "";
+        attachement.EvidenceOfCompletion.Description = filename || "";
+        //console.log(`<a href="${attachement.Url}" target="_blank">${attachement.Description}</a>`);
+      }  
+      //console.log("[getAttachements] References - " + references.length + " - " + taskId + " ; "+ attachement.Description+ " => " + attachement.Url);
+        
+    }
     return attachement || {Url:"",Description:""}; // Devuelve el nombre si lo encuentra, sino undefined
   }
 

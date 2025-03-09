@@ -85,7 +85,8 @@ export default class ProjectDashboard extends React.Component<
             {spGateListItems.length > 0 && (
               <a
                 onClick={() => {
-                  this.setState({ showDetails: !showDetails });
+                  this.setState({ showDetails: !showDetails });   
+                  //if (showDetails) this.populateAttachements();
                 }}
               >
                 <div>
@@ -111,11 +112,8 @@ export default class ProjectDashboard extends React.Component<
                   label="List Tasks"
                   checked={showTasks}
                   onChange={(ev) => {
-                    this.setState({ showTasks: ev.currentTarget.checked });
-
-                    // this._showTasks = ev.currentTarget.checked;
-                    // //this.handleSwitchTaskChange(ev.currentTarget.checked);
-                    // this.onGetTaskListItemsChanged();
+                    this.setState({ showTasks: ev.currentTarget.checked }); 
+                                      
                   }}
                 />
                 <Switch
@@ -200,6 +198,10 @@ export default class ProjectDashboard extends React.Component<
     this.setState({ showTasks: true });
     MessageLog("ProjectDashboar/onReset...");
   }
+
+  //  private populateAttachements = (): void => {
+  //   if (this.props.onPopulateAttachements) this.props.onPopulateAttachements();
+  // };
 
   // private onGetTaskListItemsChanged = (): void => {
   //   if (this.props.onGetTaskListItems) this.props.onGetTaskListItems();

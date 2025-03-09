@@ -81,6 +81,7 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
         spTaskListItems: this._tasks,
         spFilteredTaskItems: this._filteredTasks,
         onGetTaskListItems: this._onGetTaskListItems,
+        onPopulateAttachements: this._onPopulateAttachements,
         selectedTask: this._selectedTask,
         //spProjectListItems: this._projects,
         //onGetProjectListItems: this._onGetProjectListItems,
@@ -128,13 +129,6 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
   }
 
   protected getPropertyPaneConfiguration(): IPropertyPaneConfiguration {
-    // const dropdownOptions = this._projects.map((project, index) => ({
-    //   key: project.Title,    
-    //   text: project.Title
-    // }));
-    // if (!this.properties.projectName && dropdownOptions.length > 0) {
-    //   this.properties.projectName = dropdownOptions[0].key; // Selecciona el primer key por defecto
-    // }
 
     return {
       pages: [
@@ -150,11 +144,7 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
                   label: "Project Name:",
                   description: "Define the name to be shown in the header..."
                 }),
-              // PropertyPaneDropdown('description', {
-              //     label: 'Project Setup',
-              //     options: dropdownOptions,
-              //     selectedKey: this.properties.projectName,
-              //   }),
+             
                 PropertyPaneToggle('isDashboard', {
                     label: 'Is Dashboard',
                     onText: 'On',
@@ -255,6 +245,7 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
 
     this._selectedTask = this.newTask();
     this.render();
+    await this._onPopulateAttachements();
 
   }
 
@@ -391,6 +382,15 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
       this._sysError = true;
       return [];
     }
+  }
+
+  private _onPopulateAttachements = async (): Promise<void> => {
+    // Obtener el cliente de Microsoft Graph (versión V3)
+    const graphClient: MSGraphClientV3 = await this.context.msGraphClientFactory.getClient("3");
+    // Crear una instancia del servicio de Planner
+    const plannerService = new PlannerService(graphClient);
+    this._tasks = await plannerService.populateAttachements(this._tasks);
+    this.render();
   }
 
   private _onGetGateListItems = async (): Promise<void> => {

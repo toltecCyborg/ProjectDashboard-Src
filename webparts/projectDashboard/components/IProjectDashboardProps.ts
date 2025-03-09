@@ -13,6 +13,7 @@ export interface IProjectDashboardProps {
   spGateListItems: IGateListItem[];
   onGetGateListItems?: ButtonClickedCallback;
   onReset?: ButtonClickedCallback;
+  onPopulateAttachements?: ButtonClickedCallback;
   onSelectItem: (item: string, group: string) => void;
   description: string;
   project: IProjectListItem;
