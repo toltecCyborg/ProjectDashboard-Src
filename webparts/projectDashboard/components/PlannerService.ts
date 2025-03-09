@@ -52,7 +52,10 @@ export class PlannerService {
         .get();
 
       const tasks: IPlannerListItem[] = tasksResponse.value; // Accede a `value`
-           
+      
+      /**** */
+      
+      /**** */
       // Mapear los datos a la interfaz IPlanListItem
       return Object.values(tasks).map((task: IPlannerListItem) => ({
         Id: task.id,
@@ -76,40 +79,37 @@ export class PlannerService {
   }
 
   public async populateAttachements(tasks: ITaskListItem[] ) : Promise<ITaskListItem[]> {
-    if(tasks.length > 0){            
-      for(let i=0; i < tasks.length ; i++){          
-        const attachments = this.getAttachements(tasks[i].Id) ;
-        if((await attachments).EvidenceOfCompletion?.Description){
-          tasks[i].EvidenceOfCompletion = (await attachments).EvidenceOfCompletion;
-          // tasks[i].AttachementUrl = (await attachments).Url;
-          // tasks[i].AttachementDescription = (await attachments).Description;
-          console.log(`<a href="${tasks[i].EvidenceOfCompletion?.Url}" target="_blank">${tasks[i].EvidenceOfCompletion?.Description}</a>`);
-          //console.log(`<a href="${tasks[i].AttachementUrl}" target="_blank">${tasks[i].AttachementDescription}</a>`);
-        }           
-      }
-    }   
+    if (tasks.length > 0) {
+      const tasksWithAttachments = await Promise.all(
+        tasks.map(async (task) => {
+          const taskDetails = await this.graphClient
+            .api(`/planner/tasks/${task.Id}/details`)
+            .get();
+    
+          // Verifica si hay archivos adjuntos
+          if (taskDetails.references && Object.keys(taskDetails.references).length > 0) {
+            const attachments = this.getAttachements(task.Id) ;
+            if((await attachments).EvidenceOfCompletion?.Description){
+              task.EvidenceOfCompletion = (await attachments).EvidenceOfCompletion;
+              // tasks[i].AttachementUrl = (await attachments).Url;
+              // tasks[i].AttachementDescription = (await attachments).Description;
+              console.log(`<a href="${task.EvidenceOfCompletion?.Url}" target="_blank">${task.EvidenceOfCompletion?.Description}</a>`);
+              //console.log(`<a href="${tasks[i].AttachementUrl}" target="_blank">${tasks[i].AttachementDescription}</a>`);
+            }     
+          }
+          return null;
+        })
+      );
+    
+      // Filtra solo las tareas con adjuntos
+      const filteredTasks = tasksWithAttachments.filter((task) => task !== null);
+    
+      console.log("Tareas con archivos adjuntos:", filteredTasks);
+    }
+    
     return tasks;
-
-    // return Object.values(tasks).map((task: IPlannerListItem) => ({
-    //   id: task.id,
-    //   title: task.title,
-    //   orderHint: task.orderHint,
-    //   startDateTime: task.startDateTime,
-    //   dueDateTime: task.dueDateTime,
-    //   completedDateTime: task.completedDateTime,
-    //   percentComplete: task.percentComplete,
-    //   priority: task.priority,
-    //   checklistItemCount: task.checklistItemCount,
-    //   activeChecklistItemCount: task.activeChecklistItemCount,
-    //   planId: task.planId,
-    //   bucketId: task.bucketId,
-    //   planName: task.planName,
-    //   bucketName: task.bucketName,
-    //   attachementUrl : task.attachementUrl,
-    //   attachementDescription: task.attachementDescription,
-    // }))
-    // ; 
   }
+
 
   private async getAttachements(taskId: string): Promise<IAttachements > {
     let attachement: IAttachements = {
