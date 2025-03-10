@@ -140,11 +140,7 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
             {
               groupName: "Setup Project",
               groupFields: [              
-                PropertyPaneTextField('description', {
-                  label: "Project Name:",
-                  description: "Define the name to be shown in the header..."
-                }),
-             
+                
                 PropertyPaneToggle('isDashboard', {
                     label: 'Is Dashboard',
                     onText: 'On',
@@ -173,6 +169,10 @@ export default class ProjectDashboardWebPart extends BaseClientSideWebPart<IProj
                   onText: 'On',
                   offText: 'Off'
                 }),
+                PropertyPaneTextField('description', {
+                  label: "Description",
+                  description: "Project Description to be shared with user..."
+                }),             
                 PropertyPaneTextField('refreshInterval', {
                   label: 'Refresh Interval'
                 }),

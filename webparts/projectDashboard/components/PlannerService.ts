@@ -93,7 +93,7 @@ export class PlannerService {
               task.EvidenceOfCompletion = (await attachments).EvidenceOfCompletion;
               // tasks[i].AttachementUrl = (await attachments).Url;
               // tasks[i].AttachementDescription = (await attachments).Description;
-              console.log(`<a href="${task.EvidenceOfCompletion?.Url}" target="_blank">${task.EvidenceOfCompletion?.Description}</a>`);
+              //console.log(`<a href="${task.EvidenceOfCompletion?.Url}" target="_blank">${task.EvidenceOfCompletion?.Description}</a>`);
               //console.log(`<a href="${tasks[i].AttachementUrl}" target="_blank">${tasks[i].AttachementDescription}</a>`);
             }     
           }

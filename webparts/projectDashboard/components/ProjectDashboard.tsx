@@ -55,33 +55,33 @@ export default class ProjectDashboard extends React.Component<
 
     return (
       <>
+        <div id="progress-header" className={styles["rowContainer"]}>
+          <button
+            type="button"
+            className={styles["iconButton"]}
+            onClick={() => {
+              this.onReset();
+            }}
+          >
+            <img
+              alt=""
+              src={require("../assets/Restart.jpg")}
+              className={styles["iconImage"]}
+            />
+          </button>
+          <div>
+            <a
+              //          href="https://ed2corp.sharepoint.com/sites/ED2Team/SitePages/SW_RFCascade.aspx"
+              href={project.Link.Url}
+              target="_blank"
+            >
+              <h2> {project.Title} </h2>
+            </a>
+          </div>
+        </div>
+
         {this.props.isDashboard && (
           <div className="task-card">
-            <div id="progress-header" className={styles["rowContainer"]}>
-              <button
-                type="button"
-                className={styles["iconButton"]}
-                onClick={() => {
-                  this.onReset();
-                }}
-              >
-                <img
-                  alt=""
-                  src={require("../assets/Restart.jpg")}
-                  className={styles["iconImage"]}
-                />
-              </button>
-              <div>
-                <a
-                  //          href="https://ed2corp.sharepoint.com/sites/ED2Team/SitePages/SW_RFCascade.aspx"
-                  href={project.Link.Url}
-                  target="_blank"
-                >
-                  <h2> {project.Title} </h2>
-                </a>
-              </div>
-            </div>
-
             {spGateListItems.length > 0 && (
               <a
                 onClick={() => {
